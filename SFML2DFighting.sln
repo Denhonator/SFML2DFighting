@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SFML2DFighting", "SFML2DFighting\SFML2DFighting.vcxproj", "{71C21D32-34DD-48D5-A162-6EBAE4385CF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Debug|x64.ActiveCfg = Debug|x64
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Debug|x64.Build.0 = Debug|x64
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Debug|x86.ActiveCfg = Debug|Win32
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Debug|x86.Build.0 = Debug|Win32
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Release|x64.ActiveCfg = Release|x64
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Release|x64.Build.0 = Release|x64
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Release|x86.ActiveCfg = Release|Win32
+		{71C21D32-34DD-48D5-A162-6EBAE4385CF5}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6D5F8EAF-0009-4574-BF8F-67198BB514E3}
+	EndGlobalSection
+EndGlobal
