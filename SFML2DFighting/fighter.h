@@ -64,7 +64,7 @@ public:
 			else if(frame==30)
 				sprite.setTextureRect(sf::IntRect(69, 23, 25, 35));
 		}
-		if (state == "run") {
+		else if (state == "run") {
 			if(frame==75)
 				sprite.setTextureRect(sf::IntRect(437, 26, 28, 33));
 			else if (frame == 60)
@@ -76,11 +76,14 @@ public:
 			else if (frame == 15)
 				sprite.setTextureRect(sf::IntRect(561, 30, 33, 30));
 		}
-		if (state == "jump") {
+		else if (state == "jump") {
 			if(doublejumps%2==0)
 				sprite.setTextureRect(sf::IntRect(499, 30, 33, 30));
 			else
 				sprite.setTextureRect(sf::IntRect(561, 30, 33, 30));
+		}
+		else if (state == "duck") {
+			sprite.setTextureRect(sf::IntRect(388, 29, 41, 26));
 		}
 		if (flip) {
 			sprite.setOrigin(sprite.getTextureRect().width, 0);
@@ -90,13 +93,15 @@ public:
 			sprite.setOrigin(0, 0);
 			sprite.setScale(3, 3);
 		}
-		sprite.setPosition(sf::Vector2f(pos.x-15, pos.y-5));
+		sprite.setPosition(sf::Vector2f(pos.x-(((sprite.getTextureRect().width*3)-size.x)/2), pos.y-5));
 		frame--;
 		prevState = state;
 	}
 
 private:
 	sf::Vector2f size;
+	sf::Vector2f normalSize;
+	sf::Vector2f duckSize;
 	sf::Texture texture;
 	sf::Sprite sprite;
 	sf::String state;
