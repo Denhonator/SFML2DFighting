@@ -1,6 +1,6 @@
 #include "Fighter.h"
 #include "Wall.h"
-
+#include <iostream>
 
 Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet)
 {
@@ -10,14 +10,17 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	pos = position;
 	if (!texture.loadFromFile(spritesheet))
 		std::printf("Could not find %s", spritesheet);
+	fighterName = spritesheet.substring(0, spritesheet.find("."));
 	speed = sf::Vector2f(0, 0);
 	movementSpeed = 4;
 	maxSpeed = sf::Vector2f(20, 30);
 	sprite.setPosition(pos);
 	state = "idle";
+	substate = 0;
 	prevState = "idle";
 	onGround = false;
 	frame = -1;
+	defineSprites();
 	sprite.setTexture(texture);
 }
 
@@ -31,10 +34,14 @@ sf::Sprite Fighter::getSprite()
 	return sprite;
 }
 
-void Fighter::physics(Wall wall[])
+void Fighter::physics(Wall wall[], sf::String inputMethod)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		if (state != "duck") {
+	sf::String input = Fighter::chosenAction(inputMethod);
+
+//Moving
+//----------------------------------------------------------------------
+	if (input.find("D")!=sf::String::InvalidPos) {
+		if (state != "duck"&&state!="normalattack") {
 			if (speed.x < maxSpeed.x) {
 				speed.x += movementSpeed;
 			}
@@ -43,8 +50,8 @@ void Fighter::physics(Wall wall[])
 		}
 		flip = false;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		if (state != "duck") {
+	if (input.find("A") != sf::String::InvalidPos) {
+		if (state != "duck"&&state != "normalattack") {
 			if (speed.x > -maxSpeed.x) {
 				speed.x -= movementSpeed;
 			}
@@ -53,7 +60,9 @@ void Fighter::physics(Wall wall[])
 		}
 		flip = true;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)&&state!="duck") {
+//Jumping
+//----------------------------------------------------------------------
+	if (input.find("W") != sf::String::InvalidPos&&state!="duck"&&state != "normalattack") {
 		if (speed.y == 0&&canJump) {
 			speed.y = -7;
 			canJump = false;
@@ -74,7 +83,9 @@ void Fighter::physics(Wall wall[])
 		doubleJump = true;
 		jumpHold = 10;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)&&onGround) {
+//Ducking
+//----------------------------------------------------------------------
+	if (input.find("S") != sf::String::InvalidPos&&onGround&&state != "normalattack") {
 		if(size!=duckSize)
 			pos.y += normalSize.y - duckSize.y;
 		size = duckSize;
@@ -85,7 +96,14 @@ void Fighter::physics(Wall wall[])
 		pos.y -= normalSize.y - duckSize.y;
 		state = "idle";
 	}
-
+//Attacking
+//----------------------------------------------------------------------
+	if (input.find("F") != sf::String::InvalidPos&&onGround) {
+		if(onGround)
+			state = "normalattack";
+	}
+//Modify speed and position
+//----------------------------------------------------------------------
 	if (speed.y<maxSpeed.y) {
 		speed.y += movementSpeed * 0.2f;
 	}
@@ -99,7 +117,9 @@ void Fighter::physics(Wall wall[])
 	pos.x += speed.x;
 	pos.y += speed.y;
 
-	if (speed.x == 0 && speed.y == 0 && collided && state!="duck") {
+//Animate
+//----------------------------------------------------------------------
+	if (speed.x == 0 && speed.y == 0 && collided && state != "duck" && state != "normalattack") {
 		state = "idle";
 	}
 	Fighter::animate();

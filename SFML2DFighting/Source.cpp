@@ -45,7 +45,7 @@ int main()
 				wall[i].update();
 			}
 
-			blue.physics(wall);
+			blue.physics(wall, "WASD");
 
 			if (frame%frameDivider != 0)
 				skipFrame = true;
