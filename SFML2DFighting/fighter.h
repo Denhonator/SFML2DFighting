@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Wall.h"
 #include <iostream>
+#include "Hitbox.h"
 class Fighter
 {
 public:
@@ -10,6 +11,7 @@ public:
 	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet);
 	~Fighter();
 	sf::Sprite getSprite();
+	Hitbox * getHitboxes();
 	void physics(Wall wall[], sf::String inputMethod);
 
 	sf::Vector2f collision(Wall wall[], sf::Vector2f speed, sf::Vector2f pos, sf::Vector2f size) {
@@ -53,7 +55,7 @@ public:
 		if (state != prevState)
 			frame = -1;
 
-//Animation control
+//State control
 //--------------------------------------------------------------------------------------------
 		if (state == "idle") {
 			if (frame < 0) {
@@ -106,6 +108,21 @@ public:
 			}
 		}
 
+//Hitbox Definitions (for now only one at a time)
+//-------------------------------------------------------------------------------------------------------
+		if (state == "normalattack"&&substate == 1) {
+			hitbox[0].solid = true;
+			hitbox[0].pos = pos;
+			if(flip)
+				hitbox[0].pos+= sf::Vector2f(-45, 20);
+			else
+				hitbox[0].pos += sf::Vector2f(75, 20);
+			hitbox[0].size = sf::Vector2f(20, 20);
+		}
+		else
+			hitbox[0].solid = false;
+		hitbox[0].update();
+
 //Set sprite with possible flip and scaling
 //-------------------------------------------------------------------------------------------------------
 		sprite.setTextureRect(spriteDefinitions[state + std::to_string(substate)]);
@@ -124,7 +141,7 @@ public:
 		sprite.setPosition(sf::Vector2f(pos.x+offset.x-(((sprite.getTextureRect().width*3)-size.x)/2), pos.y+offset.y-5));
 		frame--;
 		prevState = state;
-		std::cout << std::string(state) + std::to_string(substate) << std::endl;
+		//std::cout << std::string(state) + std::to_string(substate) << std::endl;
 	}
 
 
@@ -140,6 +157,18 @@ public:
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 				action += "S";
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+				action += "F";
+		}
+		if (inputMethod == "ARROWS") {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+				action += "A";
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))	//can't move in both directions at once
+				action += "D";
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+				action += "W";
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+				action += "S";
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 				action += "F";
 		}
 		return action;
@@ -187,5 +216,6 @@ private:
 	int doublejumps = 0;
 	float jumpHold = 0;
 	std::map <sf::String, sf::IntRect> spriteDefinitions;
+	Hitbox hitbox[10];
 };
 

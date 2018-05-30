@@ -22,6 +22,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	frame = -1;
 	defineSprites();
 	sprite.setTexture(texture);
+	hitbox[0] = Hitbox(sf::Vector2f(1, 1), sf::Vector2f(1, 1));
 }
 
 
@@ -32,6 +33,11 @@ Fighter::~Fighter()
 sf::Sprite Fighter::getSprite()
 {
 	return sprite;
+}
+
+Hitbox * Fighter::getHitboxes()
+{
+	return hitbox;
 }
 
 void Fighter::physics(Wall wall[], sf::String inputMethod)
@@ -101,6 +107,9 @@ void Fighter::physics(Wall wall[], sf::String inputMethod)
 	if (input.find("F") != sf::String::InvalidPos&&onGround) {
 		if(onGround)
 			state = "normalattack";
+	}
+	if (state == "normalattack"&&substate == 1) {
+
 	}
 //Modify speed and position
 //----------------------------------------------------------------------

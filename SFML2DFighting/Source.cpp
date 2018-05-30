@@ -21,6 +21,7 @@ int main()
 	uint32_t frame = 0;
 
 	Fighter blue(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png");
+	Fighter red(sf::Vector2f(50, 90), sf::Vector2f(600, 800), "toad.png");
 	Wall wall[wallCount];
 
 	sf::Texture background;
@@ -46,6 +47,7 @@ int main()
 			}
 
 			blue.physics(wall, "WASD");
+			red.physics(wall, "ARROWS");
 
 			if (frame%frameDivider != 0)
 				skipFrame = true;
@@ -53,6 +55,11 @@ int main()
 				window.clear();
 				window.draw(bcg);
 				window.draw(blue.getSprite());
+				window.draw(red.getSprite());
+				for (int i = 0; i < 10; i++) {
+					if (blue.getHitboxes()[i].solid)
+						window.draw(blue.getHitboxes()[i].getRectangle());
+				}
 				for (int i = 0; i < wallCount; i++) {
 					window.draw(wall[i].getRectangle());
 				}
