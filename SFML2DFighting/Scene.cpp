@@ -1,11 +1,12 @@
 #include "Scene.h"
+#include "fighter.h"
 #include <SFML/Graphics.hpp>
 #include <iostream> 
 
 Scene::Scene()
 {
-	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png"));
-	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(600, 800), "toad.png"));
+	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png", 0));
+	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(600, 800), "toad.png", 1));
 
 	createWalls();
 
@@ -47,8 +48,10 @@ void Scene::update()
 		for (int j = 0; j<hitboxes.size(); j++) {
 			rectDrawList.push_back(hitboxes.at(j).getRectangle());
 			std::vector<int> hits = hitboxes.at(j).hitcheck();
-			for (int k = 0; k < hits.size(); k++)
-				std::cout << i << " hit " << hits.at(k) << std::endl;
+			for (int k = 0; k < hits.size(); k++) {
+				//std::cout << i << " hit " << hits.at(k) << std::endl;
+				fighter.at(hits.at(k)).getHit(hitboxes.at(j));
+			}
 		}
 	}
 }

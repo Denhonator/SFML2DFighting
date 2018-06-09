@@ -2,8 +2,9 @@
 #include "Wall.h"
 #include <iostream>
 
-Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet)
+Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i)
 {
+	id = i;
 	size = boxSize;
 	normalSize = size;
 	duckSize = sf::Vector2f(normalSize.x, normalSize.y*0.7f);
@@ -46,6 +47,14 @@ sf::Texture Fighter::getTexture()
 std::vector<Hitbox> Fighter::getHitboxes()
 {
 	return hitbox;
+}
+
+void Fighter::getHit(Hitbox hit)
+{
+	if (iframe == 0) {
+		std::cout << "Fighter " << id << " was hit for " << hit.damage << " damage by fighter " << hit.owner << std::endl;
+		iframe = 10;
+	}
 }
 
 void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
@@ -116,9 +125,8 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		if(onGround)
 			state = "normalattack";
 	}
-	if (state == "normalattack"&&substate == 1) {
-
-	}
+	if (iframe > 0)
+		iframe--;
 //Modify speed and position
 //----------------------------------------------------------------------
 	if (speed.y<maxSpeed.y) {

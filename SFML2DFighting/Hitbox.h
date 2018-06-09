@@ -12,6 +12,8 @@ public:
 	std::vector<int> hitcheck();
 	void update();
 	bool solid;
+	int damage;
+	int owner;
 private:
 	sf::RectangleShape rectangle;
 };

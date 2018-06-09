@@ -9,12 +9,13 @@ public:
 	sf::Vector2f size;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
-	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet);
+	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i);
 	Fighter();
 	~Fighter();
 	sf::Sprite getSprite();
 	sf::Texture getTexture();
 	std::vector<Hitbox> getHitboxes();
+	void getHit(Hitbox hit);
 	void physics(std::vector<Wall> wall, sf::String inputMethod);
 
 	sf::Vector2f collision(std::vector<Wall> wall, sf::Vector2f speed, sf::Vector2f pos, sf::Vector2f size) {
@@ -116,6 +117,8 @@ public:
 		hitbox.clear();
 		if (state == "normalattack"&&substate == 1) {
 			Hitbox addbox = Hitbox(sf::Vector2f(20, 20), pos);
+			addbox.damage = 10;
+			addbox.owner = id;
 			if(flip)
 				addbox.pos+= sf::Vector2f(-45, 20);
 			else
@@ -196,8 +199,8 @@ public:
 
 		}
 	}
-
 private:
+	int id;
 	sf::Vector2f normalSize;
 	sf::Vector2f duckSize;
 	sf::Texture texture;
@@ -208,6 +211,7 @@ private:
 	sf::String fighterName;
 	bool flip = false;
 	int frame;
+	int iframe = 0;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	bool canJump = false;
@@ -219,4 +223,3 @@ private:
 	std::map <sf::String, sf::IntRect> spriteDefinitions;
 	std::vector<Hitbox> hitbox;
 };
-
