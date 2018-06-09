@@ -9,29 +9,31 @@ public:
 	sf::Vector2f pos;
 	sf::Vector2f speed;
 	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet);
+	Fighter();
 	~Fighter();
 	sf::Sprite getSprite();
-	Hitbox * getHitboxes();
-	void physics(Wall wall[], sf::String inputMethod);
+	sf::Texture getTexture();
+	std::vector<Hitbox> getHitboxes();
+	void physics(std::vector<Wall> wall, sf::String inputMethod);
 
-	sf::Vector2f collision(Wall wall[], sf::Vector2f speed, sf::Vector2f pos, sf::Vector2f size) {
+	sf::Vector2f collision(std::vector<Wall> wall, sf::Vector2f speed, sf::Vector2f pos, sf::Vector2f size) {
 		sf::Vector2f spd = speed;
 		bool col = false;
 		onGround = false;
-		for (int i = 0; wall[i].isSolid(); i++) {
+		for (int i = 0; i<wall.size() ; i++) {
 			//std::printf("%f, %f\n", pos.x, pos.y);
-			if ((pos.x + size.x) > wall[i].pos.x&&pos.x < (wall[i].pos.x + wall[i].size.x))
-				if (wall[i].pos.y > (pos.y + size.y - 5) && speed.y >= 0)
-					speed.y = std::fmin(speed.y, wall[i].pos.y - (pos.y + size.y));
-				else if ((wall[i].pos.y+wall[i].size.y-5)<pos.y&&speed.y < 0)
-					speed.y = std::fmax(speed.y, (wall[i].pos.y + wall[i].size.y) - pos.y);
+			if ((pos.x + size.x) > wall.at(i).pos.x&&pos.x < (wall.at(i).pos.x + wall.at(i).size.x))
+				if (wall.at(i).pos.y > (pos.y + size.y - 5) && speed.y >= 0)
+					speed.y = std::fmin(speed.y, wall.at(i).pos.y - (pos.y + size.y));
+				else if ((wall.at(i).pos.y+wall.at(i).size.y-5)<pos.y&&speed.y < 0)
+					speed.y = std::fmax(speed.y, (wall.at(i).pos.y + wall.at(i).size.y) - pos.y);
 
-			if (pos.y<(wall[i].pos.y + wall[i].size.y)&&(pos.y + size.y)>wall[i].pos.y) {
-				if (speed.x > 0 && wall[i].pos.x>pos.x) {
-					speed.x = std::fmin(speed.x, wall[i].pos.x - (pos.x+size.x));
+			if (pos.y<(wall.at(i).pos.y + wall.at(i).size.y)&&(pos.y + size.y)>wall.at(i).pos.y) {
+				if (speed.x > 0 && wall.at(i).pos.x>pos.x) {
+					speed.x = std::fmin(speed.x, wall.at(i).pos.x - (pos.x+size.x));
 				}
-				if (speed.x < 0 && (wall[i].pos.x+wall[i].size.x)<pos.x+5) {
-					speed.x = std::fmax(speed.x, (wall[i].pos.x + wall[i].size.x) - pos.x);
+				if (speed.x < 0 && (wall.at(i).pos.x+wall.at(i).size.x)<pos.x+5) {
+					speed.x = std::fmax(speed.x, (wall.at(i).pos.x + wall.at(i).size.x) - pos.x);
 				}
 			}
 			if (speed.x != spd.x || speed.y != spd.y) {
@@ -110,21 +112,20 @@ public:
 
 //Hitbox Definitions (for now only one at a time)
 //-------------------------------------------------------------------------------------------------------
+		hitbox.clear();
 		if (state == "normalattack"&&substate == 1) {
-			hitbox[0].solid = true;
-			hitbox[0].pos = pos;
+			Hitbox addbox = Hitbox(sf::Vector2f(20, 20), pos);
 			if(flip)
-				hitbox[0].pos+= sf::Vector2f(-45, 20);
+				addbox.pos+= sf::Vector2f(-45, 20);
 			else
-				hitbox[0].pos += sf::Vector2f(75, 20);
-			hitbox[0].size = sf::Vector2f(20, 20);
+				addbox.pos += sf::Vector2f(75, 20);
+			addbox.update();
+			hitbox.push_back(addbox);
 		}
-		else
-			hitbox[0].solid = false;
-		hitbox[0].update();
 
 //Set sprite with possible flip and scaling
 //-------------------------------------------------------------------------------------------------------
+		sprite.setTexture(texture);
 		sprite.setTextureRect(spriteDefinitions[state + std::to_string(substate)]);
 		if (flip) {
 			sprite.setOrigin(sprite.getTextureRect().width, 0);
@@ -216,6 +217,6 @@ private:
 	int doublejumps = 0;
 	float jumpHold = 0;
 	std::map <sf::String, sf::IntRect> spriteDefinitions;
-	Hitbox hitbox[10];
+	std::vector<Hitbox> hitbox;
 };
 

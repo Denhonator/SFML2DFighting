@@ -22,7 +22,10 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	frame = -1;
 	defineSprites();
 	sprite.setTexture(texture);
-	hitbox[0] = Hitbox(sf::Vector2f(1, 1), sf::Vector2f(1, 1));
+}
+
+Fighter::Fighter()
+{
 }
 
 
@@ -35,12 +38,17 @@ sf::Sprite Fighter::getSprite()
 	return sprite;
 }
 
-Hitbox * Fighter::getHitboxes()
+sf::Texture Fighter::getTexture()
+{
+	return texture;
+}
+
+std::vector<Hitbox> Fighter::getHitboxes()
 {
 	return hitbox;
 }
 
-void Fighter::physics(Wall wall[], sf::String inputMethod)
+void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
 

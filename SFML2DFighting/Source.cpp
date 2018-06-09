@@ -1,13 +1,7 @@
 #include <SFML/Graphics.hpp>
-#include "fighter.h"
+#include "Scene.h"
+#include "Fighter.h"
 #include "Wall.h"
-
-void createWalls(Wall wall[]) {
-	wall[0] = Wall(sf::Vector2f(2000, 10), sf::Vector2f(270, 1200), sf::Color(75, 35, 20));
-	wall[1] = Wall(sf::Vector2f(500, 20), sf::Vector2f(700, 1000), sf::Color(75, 35, 20));
-	wall[2] = Wall(sf::Vector2f(500, 20), sf::Vector2f(1200, 800), sf::Color(75, 35, 20));
-	wall[3] = Wall(sf::Vector2f(10, 200), sf::Vector2f(1800, 1000), sf::Color(75, 35, 20));
-}
 
 int main()
 {
@@ -19,20 +13,7 @@ int main()
 	bool skipFrame = false;
 	const int wallCount = 20;
 	uint32_t frame = 0;
-
-	Fighter blue(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png");
-	Fighter red(sf::Vector2f(50, 90), sf::Vector2f(600, 800), "toad.png");
-	Wall wall[wallCount];
-
-	sf::Texture background;
-	if (!background.loadFromFile("background.png"))
-		printf("background.png not found");
-	sf::Sprite bcg;
-	bcg.setTexture(background);
-	bcg.setScale(5, 5);
-	bcg.setPosition(0, -500);
-
-	createWalls(wall);
+	Scene scene = Scene();
 
 	while (window.isOpen())
 	{
@@ -42,28 +23,25 @@ int main()
 			skipFrame = false;
 			frame++;
 
-			for (int i = 0; i < wallCount; i++) {
-				wall[i].update();
-			}
-
-			blue.physics(wall, "WASD");
-			red.physics(wall, "ARROWS");
+			scene.update();
 
 			if (frame%frameDivider != 0)
 				skipFrame = true;
 			if (!skipFrame) {
-				window.clear();
-				window.draw(bcg);
-				window.draw(blue.getSprite());
-				window.draw(red.getSprite());
-				for (int i = 0; i < 10; i++) {
-					if (blue.getHitboxes()[i].solid)
-						window.draw(blue.getHitboxes()[i].getRectangle());
+				scene.draw(&window);
+				/*window.clear();
+				if (!scene.drawlist.empty()) {
+					for (int i = 0; i < scene.drawlist.size(); i++) {
+						window.draw(*scene.drawlist.at(i));
+					}
 				}
-				for (int i = 0; i < wallCount; i++) {
-					window.draw(wall[i].getRectangle());
+				scene.drawlist.clear();
+				if (!scene.rectDrawList.empty()) {
+					for (int i = 0; i < scene.rectDrawList.size(); i++)
+						window.draw(*scene.rectDrawList.at(i));
 				}
-				window.display();
+				scene.rectDrawList.clear();
+				window.display();*/
 			}
 		}
 		sf::Event event;
