@@ -3,6 +3,7 @@
 #include "Fighter.h"
 #include "Wall.h"
 
+Scene scene = Scene();
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(2560, 1440), "FIGHT");
@@ -11,9 +12,7 @@ int main()
 	int gameSpeed = 60;
 	int frameDivider = 1;
 	bool skipFrame = false;
-	const int wallCount = 20;
 	uint32_t frame = 0;
-	Scene scene = Scene();
 
 	while (window.isOpen())
 	{
@@ -29,19 +28,6 @@ int main()
 				skipFrame = true;
 			if (!skipFrame) {
 				scene.draw(&window);
-				/*window.clear();
-				if (!scene.drawlist.empty()) {
-					for (int i = 0; i < scene.drawlist.size(); i++) {
-						window.draw(*scene.drawlist.at(i));
-					}
-				}
-				scene.drawlist.clear();
-				if (!scene.rectDrawList.empty()) {
-					for (int i = 0; i < scene.rectDrawList.size(); i++)
-						window.draw(*scene.rectDrawList.at(i));
-				}
-				scene.rectDrawList.clear();
-				window.display();*/
 			}
 		}
 		sf::Event event;

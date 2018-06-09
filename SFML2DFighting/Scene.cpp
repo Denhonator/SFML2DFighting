@@ -46,6 +46,9 @@ void Scene::update()
 		hitboxes = fighter.at(i).getHitboxes();
 		for (int j = 0; j<hitboxes.size(); j++) {
 			rectDrawList.push_back(hitboxes.at(j).getRectangle());
+			std::vector<int> hits = hitboxes.at(j).hitcheck();
+			for (int k = 0; k < hits.size(); k++)
+				std::cout << i << " hit " << hits.at(k) << std::endl;
 		}
 	}
 }

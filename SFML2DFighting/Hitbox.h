@@ -9,6 +9,7 @@ public:
 	Hitbox();
 	~Hitbox();
 	sf::RectangleShape getRectangle();
+	std::vector<int> hitcheck();
 	void update();
 	bool solid;
 private:

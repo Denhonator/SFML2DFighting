@@ -6,6 +6,7 @@
 class Fighter
 {
 public:
+	sf::Vector2f size;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
 	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet);
@@ -197,7 +198,6 @@ public:
 	}
 
 private:
-	sf::Vector2f size;
 	sf::Vector2f normalSize;
 	sf::Vector2f duckSize;
 	sf::Texture texture;

@@ -1,4 +1,5 @@
 #include "Hitbox.h"
+#include "Scene.h"
 
 Hitbox::Hitbox(sf::Vector2f boxSize, sf::Vector2f position)
 {
@@ -25,6 +26,26 @@ Hitbox::~Hitbox()
 sf::RectangleShape Hitbox::getRectangle()
 {
 	return rectangle;
+}
+
+std::vector<int> Hitbox::hitcheck()
+{
+	std::vector<int> hits;
+	sf::Vector2f fsize;
+	sf::Vector2f fpos;
+	extern Scene scene;
+	for (int i = 0; i<scene.fighter.size(); i++) {
+		fsize = scene.fighter.at(i).size;
+		fpos = scene.fighter.at(i).pos;
+		if (pos.x >= fpos.x&&pos.x <= fpos.x + fsize.x || 
+			fpos.x >= pos.x&&fpos.x <= pos.x+size.x) {
+			if (pos.y >= fpos.y&&pos.y <= fpos.y + fsize.y ||
+				fpos.y >= pos.y&&fpos.y <= pos.y + size.y) {
+				hits.push_back(i);
+			}
+		}
+	}
+	return hits;
 }
 
 void Hitbox::update()
