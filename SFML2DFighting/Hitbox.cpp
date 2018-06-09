@@ -9,6 +9,7 @@ Hitbox::Hitbox(sf::Vector2f boxSize, sf::Vector2f position)
 	rectangle.setFillColor(sf::Color(255, 0, 0, 128));
 	solid = true;
 	rectangle.setPosition(pos);
+	speed = sf::Vector2f(0, 0);
 }
 
 Hitbox::Hitbox() {
@@ -17,6 +18,7 @@ Hitbox::Hitbox() {
 	pos = sf::Vector2f(0, 0);
 	rectangle.setFillColor(sf::Color(0, 0, 0));
 	solid = true;
+	speed = sf::Vector2f(0, 0);
 }
 
 Hitbox::~Hitbox()

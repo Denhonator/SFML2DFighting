@@ -14,6 +14,9 @@ public:
 	bool solid;
 	int damage;
 	int owner;
+	int iframe;
+	int losecontrol;
+	sf::Vector2f speed;
 private:
 	sf::RectangleShape rectangle;
 };

@@ -53,7 +53,9 @@ void Fighter::getHit(Hitbox hit)
 {
 	if (iframe == 0) {
 		std::cout << "Fighter " << id << " was hit for " << hit.damage << " damage by fighter " << hit.owner << std::endl;
-		iframe = 10;
+		iframe = hit.iframe;
+		losecontrol = hit.losecontrol;
+		speed = hit.speed;
 	}
 }
 
@@ -132,8 +134,10 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	if (speed.y<maxSpeed.y) {
 		speed.y += movementSpeed * 0.2f;
 	}
-
-	speed.x *= 0.7f;
+	if (losecontrol > 0)
+		losecontrol--;
+	if(losecontrol==0)
+		speed.x *= 0.7f;
 	if (abs(speed.x) < 0.01f)
 		speed.x = 0;
 

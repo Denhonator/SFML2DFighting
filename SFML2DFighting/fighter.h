@@ -112,17 +112,24 @@ public:
 			}
 		}
 
-//Hitbox Definitions (for now only one at a time)
+//Hitbox Definitions
 //-------------------------------------------------------------------------------------------------------
 		hitbox.clear();
 		if (state == "normalattack"&&substate == 1) {
 			Hitbox addbox = Hitbox(sf::Vector2f(20, 20), pos);
 			addbox.damage = 10;
+			addbox.iframe = 20;
+			addbox.losecontrol = 20;
 			addbox.owner = id;
-			if(flip)
-				addbox.pos+= sf::Vector2f(-45, 20);
-			else
+			addbox.speed.y = -10;
+			if (flip) {
+				addbox.pos += sf::Vector2f(-45, 20);
+				addbox.speed.x = -7;
+			}
+			else {
 				addbox.pos += sf::Vector2f(75, 20);
+				addbox.speed.x = 7;
+			}
 			addbox.update();
 			hitbox.push_back(addbox);
 		}
@@ -152,6 +159,8 @@ public:
 
 	sf::String chosenAction(sf::String inputMethod) {
 		sf::String action = "";
+		if (losecontrol > 0)
+			return "";
 		if (inputMethod == "WASD") {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 				action += "A";
@@ -212,6 +221,7 @@ private:
 	bool flip = false;
 	int frame;
 	int iframe = 0;
+	int losecontrol = 0;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	bool canJump = false;
