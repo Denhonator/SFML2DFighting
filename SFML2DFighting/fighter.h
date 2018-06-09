@@ -89,6 +89,29 @@ public:
 		else if (state == "duck") {
 			substate = 0;
 		}
+		else if (state == "fall") {
+			if (onGround) {
+				if (substate < 4)
+					substate = 4;
+				else if (substate == 4)
+					substate = 5;
+			}
+			else if (substate == 5) {
+				substate = 4;
+			}
+			if (frame < 0 && prevState!=state) {
+				frame = 7;
+				substate = 0;
+			}
+			else if (frame < 0) {
+				if (substate < 4) {
+					substate++;
+					frame = 7;
+				}
+			}
+			if (substate > 3)
+				offset = sf::Vector2f(0, -1.20*(substate-2));
+		}
 		else if (state == "normalattack") {
 			if (frame < 0&&prevState!=state) {	//Get to attacking only if state has changed
 				frame = 30;
@@ -155,10 +178,11 @@ public:
 		prevState = state;
 		//std::cout << std::string(state) + std::to_string(substate) << std::endl;
 	}
-
-
+//Input
+//-------------------------------------------------------------------------------------------------------
 	sf::String chosenAction(sf::String inputMethod) {
 		sf::String action = "";
+		pressedkey = false;
 		if (losecontrol > 0)
 			return "";
 		if (inputMethod == "WASD") {
@@ -185,6 +209,8 @@ public:
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 				action += "F";
 		}
+		if (action != "")
+			pressedkey = true;
 		return action;
 	}
 
@@ -205,13 +231,21 @@ public:
 			spriteDefinitions["normalattack0"] = sf::IntRect(99, 25, 26, 31);
 			spriteDefinitions["normalattack1"] = sf::IntRect(128, 25, 38, 31);
 			spriteDefinitions["normalattack2"] = sf::IntRect(36, 23, 25, 35);
-
+			spriteDefinitions["fall0"] = sf::IntRect(542, 160, 27, 36);
+			spriteDefinitions["fall1"] = sf::IntRect(510, 162, 28, 37);
+			spriteDefinitions["fall2"] = sf::IntRect(84, 164, 33, 34);
+			spriteDefinitions["fall3"] = sf::IntRect(402, 218, 38, 28);
+			spriteDefinitions["fall4"] = sf::IntRect(120, 174, 41, 20);
+			//spriteDefinitions["fall5"] = sf::IntRect(447, 127, 33, 27);
+			spriteDefinitions["fall5"] = sf::IntRect(549, 131, 38, 21);
 		}
 	}
 private:
 	int id;
+	bool pressedkey = false;
 	sf::Vector2f normalSize;
 	sf::Vector2f duckSize;
+	sf::Vector2f groundSize;
 	sf::Texture texture;
 	sf::Sprite sprite;
 	sf::String state;
@@ -224,6 +258,7 @@ private:
 	int losecontrol = 0;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
+	sf::Vector2f prevSpeed;
 	bool canJump = false;
 	bool doubleJump = false;
 	bool collided = false;
