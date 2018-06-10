@@ -41,7 +41,8 @@ void Scene::update()
 		fighter.at(1) = Fighter(sf::Vector2f(50, 90), sf::Vector2f(1400, 800), "toad.png", 1, sf::Color(255,50,50,255));
 	}
 	fighter.at(0).physics(wall, "WASD");
-	fighter.at(1).physics(wall, "ARROWS");
+	fighter.at(1).physics(wall, "AI");
+	fighter.at(1).ai.play();
 	drawlist.push_back(bcg);
 	for (int i = 0; i < wall.size(); i++) {
 		rectDrawList.push_back(wall.at(i).getRectangle());
@@ -49,7 +50,6 @@ void Scene::update()
 	std::vector<Hitbox> hitboxes;
 	for (int i = 0; i<fighter.size(); i++) {
 		drawlist.push_back(fighter.at(i).getSprite());
-		fighter.at(i).ai.play();
 		if (false) {
 			rectDrawList.push_back(sf::RectangleShape(fighter.at(i).size));
 			rectDrawList.back().setPosition(fighter.at(i).pos);

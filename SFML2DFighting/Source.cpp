@@ -17,33 +17,7 @@ void draw() {
 	std::vector<sf::Sprite> drawlist;
 	std::vector<sf::RectangleShape> rectDrawList;
 	bool slept = false;
-	while (running) {
-		elapsed = clock.getElapsedTime();
-		if (scene.drawready) {
-			clock.restart();
-			window.clear();
-			drawlist.clear();
-			rectDrawList.clear();
-			drawlist = scene.drawlist;
-			rectDrawList = scene.rectDrawList;
-			scene.drawlist.clear();
-			scene.rectDrawList.clear();
-
-			for (int i = 0; i < drawlist.size(); i++)
-				window.draw(drawlist.at(i));
-
-			for (int i = 0; i < rectDrawList.size(); i++)
-				window.draw(rectDrawList.at(i));
-
-			scene.drawready = false;
-			window.display();
-			slept = false;
-		}
-		else if (!slept) {
-			//std::cout << "Draw sleeping for " << (sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds() << "\n";
-			sf::sleep(sf::microseconds(16666 * (60.0f / gameSpeed)) - elapsed);
-			slept = true;
-		}
+	while (running&&window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -51,6 +25,30 @@ void draw() {
 				running = false;
 				window.close();
 			}
+		}
+		elapsed = clock.getElapsedTime();
+		if (scene.drawready) {
+			drawlist = scene.drawlist;
+			rectDrawList = scene.rectDrawList;
+			scene.drawready = false;
+			clock.restart();
+			scene.drawlist.clear();
+			scene.rectDrawList.clear();
+			window.clear();
+
+			for (int i = 0; i < drawlist.size(); i++)
+				window.draw(drawlist.at(i));
+
+			for (int i = 0; i < rectDrawList.size(); i++)
+				window.draw(rectDrawList.at(i));
+
+			window.display();
+			slept = false;
+		}
+		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {
+			//std::cout << "Draw sleeping for " << (sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds() << "\n";
+			sf::sleep(sf::microseconds(16666 * (60.0f / gameSpeed)) - elapsed);
+			slept = true;
 		}
 	}
 }
