@@ -60,21 +60,5 @@ void Scene::update()
 			}
 		}
 	}
-}
-
-void Scene::draw(sf::RenderWindow *window)
-{
-	window->clear();
-	if (!drawlist.empty()) {
-		for (int i = 0; i < drawlist.size(); i++) {
-			window->draw(drawlist.at(i));
-		}
-	}
-	drawlist.clear();
-	if (!rectDrawList.empty()) {
-		for (int i = 0; i < rectDrawList.size(); i++)
-			window->draw(rectDrawList.at(i));
-	}
-	rectDrawList.clear();
-	window->display();
+	drawready = true;
 }

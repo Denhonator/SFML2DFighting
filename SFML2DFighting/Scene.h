@@ -13,8 +13,8 @@ public:
 	~Scene();
 	void createWalls();
 	void update();
-	void draw(sf::RenderWindow *window);
 	std::vector<sf::Sprite> drawlist;
 	std::vector<sf::RectangleShape> rectDrawList;
+	bool drawready = false;
 };
 

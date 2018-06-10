@@ -122,8 +122,10 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 //Ducking
 //----------------------------------------------------------------------
 	if (input.find("S") != sf::String::InvalidPos&&onGround&&state != "normalattack") {
-		if(size!=duckSize)
+		if (size == normalSize)
 			pos.y += normalSize.y - duckSize.y;
+		else if (size == groundSize)
+			pos.y += groundSize.y - duckSize.y;
 		size = duckSize;
 		state = "duck";
 	}
