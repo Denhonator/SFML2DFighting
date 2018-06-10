@@ -1,20 +1,22 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "Wall.h"
-#include <iostream>
 #include "Hitbox.h"
+#include "AI.h"
 class Fighter
 {
 public:
 	sf::Vector2f size;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
+	AI ai;
 	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i, sf::Color color=sf::Color(255,255,255,255));
 	Fighter();
 	~Fighter();
 	sf::Sprite getSprite();
 	sf::Texture getTexture();
 	std::vector<Hitbox> getHitboxes();
+	sf::String getState();
+	int getFrame();
 	void getHit(Hitbox hit);
 	int getHealth();
 	void physics(std::vector<Wall> wall, sf::String inputMethod);
@@ -274,7 +276,7 @@ public:
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
 				action += "F";
 		}
-		if (inputMethod == "ARROWS") {
+		else if (inputMethod == "ARROWS") {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 				action += "A";
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))	//can't move in both directions at once
@@ -285,6 +287,10 @@ public:
 				action += "S";
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::RControl))
 				action += "F";
+		}
+		else if (inputMethod == "AI") {
+			ai.run = true;
+			action = ai.getKeys();
 		}
 		if (action != "")
 			pressedkey = true;
@@ -341,6 +347,7 @@ private:
 	int iframe = 0;
 	int losecontrol = 0;
 	int health;
+	int lives;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	sf::Vector2f prevSpeed;

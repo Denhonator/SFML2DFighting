@@ -20,6 +20,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	sprite.setPosition(pos);
 	state = "idle";
 	health = 200;
+	lives = 999999;
 	substate = 0;
 	prevState = "idle";
 	onGround = false;
@@ -27,6 +28,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	defineSprites();
 	sprite.setTexture(texture);
 	sprite.setColor(color);
+	ai = AI(id);
 }
 
 Fighter::Fighter()
@@ -51,6 +53,16 @@ sf::Texture Fighter::getTexture()
 std::vector<Hitbox> Fighter::getHitboxes()
 {
 	return hitbox;
+}
+
+sf::String Fighter::getState()
+{
+	return state;
+}
+
+int Fighter::getFrame()
+{
+	return frame;
 }
 
 void Fighter::getHit(Hitbox hit)

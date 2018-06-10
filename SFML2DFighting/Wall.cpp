@@ -1,7 +1,5 @@
 #include "Wall.h"
 
-
-
 Wall::Wall(sf::Vector2f boxSize, sf::Vector2f position, sf::Color color)
 {
 	size = boxSize;

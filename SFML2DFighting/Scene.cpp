@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include "fighter.h"
 #include <SFML/Graphics.hpp>
 #include <iostream> 
 
@@ -50,6 +49,7 @@ void Scene::update()
 	std::vector<Hitbox> hitboxes;
 	for (int i = 0; i<fighter.size(); i++) {
 		drawlist.push_back(fighter.at(i).getSprite());
+		fighter.at(i).ai.play();
 		if (false) {
 			rectDrawList.push_back(sf::RectangleShape(fighter.at(i).size));
 			rectDrawList.back().setPosition(fighter.at(i).pos);
