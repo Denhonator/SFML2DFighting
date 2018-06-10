@@ -114,17 +114,13 @@ public:
 		}
 		else if (state == "normalattack") {
 			if (frame < 0&&prevState!=state) {	//Get to attacking only if state has changed
-				frame = 30;
-				substate = 0;
-			}
-			else if (frame < 0) {	//If attack is ending, go to idle before attacking again
-				state = "idle";
+				frame = 25;
 				substate = 0;
 			}
 			if (state == "normalattack") {
-				if (frame == 30 || frame == 10)
+				if (frame == 25 || frame == 10)
 					substate = 0;
-				else if (frame == 20)
+				else if (frame == 18)
 					substate = 1;
 				else if (frame == 5)
 					substate = 2;
@@ -134,13 +130,27 @@ public:
 					offset = sf::Vector2f(5, 5);
 			}
 		}
+		else if (state == "groundattack") {
+			if (frame < 0 && prevState != state) {	//Get to attacking only if state has changed
+				frame = 30;
+				substate = 0;
+			}
+			if (state == "groundattack") {
+				if (frame == 20)
+					substate = 1;
+				else if (frame == 10)
+					substate = 2;
+			}
+			if (substate == 0)
+				offset = sf::Vector2f(-11, -10);
+			if (substate == 1)
+				offset = sf::Vector2f(9, -7);
+			if (substate == 2)
+				offset = sf::Vector2f(12.5f, 9);
+		}
 		else if (state == "airattack") {
 			if (frame < 0 && prevState != state) {
 				frame = 40;
-				substate = 0;
-			}
-			else if (frame < 0) {
-				state = "idle";
 				substate = 0;
 			}
 			if (onGround) {
@@ -165,36 +175,54 @@ public:
 //-------------------------------------------------------------------------------------------------------
 		hitbox.clear();
 		if (state == "normalattack"&&substate == 1) {
-			Hitbox addbox = Hitbox(sf::Vector2f(20, 20), pos);
-			addbox.damage = 10;
+			Hitbox addbox = Hitbox(sf::Vector2f(30, 30), pos);
+			addbox.damage = 15;
 			addbox.iframe = 20;
 			addbox.losecontrol = 20;
 			addbox.owner = id;
 			addbox.speed.y = -10;
 			if (flip) {
-				addbox.pos += sf::Vector2f(-45, 20);
+				addbox.pos += sf::Vector2f(-45, 15);
 				addbox.speed.x = -7;
 			}
 			else {
-				addbox.pos += sf::Vector2f(75, 20);
+				addbox.pos += sf::Vector2f(65, 15);
 				addbox.speed.x = 7;
 			}
 			addbox.update();
 			hitbox.push_back(addbox);
 		}
 		else if (state == "airattack"&&substate == 2) {
-			Hitbox addbox = Hitbox(sf::Vector2f(30, 30), pos);
+			Hitbox addbox = Hitbox(sf::Vector2f(35, 35), pos);
 			addbox.damage = 10;
 			addbox.iframe = 20;
 			addbox.losecontrol = 20;
 			addbox.owner = id;
 			addbox.speed.y = 10;
 			if (flip) {
-				addbox.pos += sf::Vector2f(-70, 3);
+				addbox.pos += sf::Vector2f(-70, 0);
 				addbox.speed.x = -4;
 			}
 			else {
-				addbox.pos += sf::Vector2f(90, 3);
+				addbox.pos += sf::Vector2f(87.5f, 0);
+				addbox.speed.x = 4;
+			}
+			addbox.update();
+			hitbox.push_back(addbox);
+		}
+		else if (state == "groundattack"&&substate == 1) {
+			Hitbox addbox = Hitbox(sf::Vector2f(50, 40), pos);
+			addbox.damage = 15;
+			addbox.iframe = 20;
+			addbox.losecontrol = 20;
+			addbox.owner = id;
+			addbox.speed.y = 10;
+			if (flip) {
+				addbox.pos += sf::Vector2f(-100, 45);
+				addbox.speed.x = -4;
+			}
+			else {
+				addbox.pos += sf::Vector2f(110, 45);
 				addbox.speed.x = 4;
 			}
 			addbox.update();
@@ -279,6 +307,9 @@ public:
 			spriteDefinitions["airattack0"] = sf::IntRect(209, 17, 34, 41);
 			spriteDefinitions["airattack1"] = sf::IntRect(250, 19, 33, 38);
 			spriteDefinitions["airattack2"] = sf::IntRect(285, 24, 51, 32);
+			spriteDefinitions["groundattack0"] = sf::IntRect(346, 67, 37, 44);
+			spriteDefinitions["groundattack1"] = sf::IntRect(391, 70, 66, 41);
+			spriteDefinitions["groundattack2"] = sf::IntRect(463, 86, 51, 25);
 			spriteDefinitions["fall0"] = sf::IntRect(542, 160, 27, 36);
 			spriteDefinitions["fall1"] = sf::IntRect(510, 162, 28, 37);
 			spriteDefinitions["fall2"] = sf::IntRect(84, 164, 33, 34);
@@ -307,7 +338,6 @@ private:
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	sf::Vector2f prevSpeed;
-	sf::Vector2f prev2Speed;
 	bool canJump = false;
 	bool doubleJump = false;
 	bool collided = false;

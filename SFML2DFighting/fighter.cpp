@@ -15,7 +15,6 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	fighterName = spritesheet.substring(0, spritesheet.find("."));
 	speed = sf::Vector2f(0, 0);
 	prevSpeed = sf::Vector2f(0, 0);
-	prev2Speed = sf::Vector2f(0, 0);
 	movementSpeed = 4;
 	maxSpeed = sf::Vector2f(20, 30);
 	sprite.setPosition(pos);
@@ -68,10 +67,19 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
 
+//Idle
+//----------------------------------------------------------------------
+	if (state == "fall"&&losecontrol == 0 && pressedkey)
+		state = "idle";
+	else if (frame < 0&&state!="fall")
+		state = "idle";
+	else if (std::abs(speed.x) < 0.1f && speed.y == 0 && collided && size == normalSize && state.find("attack") == sf::String::InvalidPos && (state != "fall")) {
+		state = "idle";
+	}
 //Moving
 //----------------------------------------------------------------------
 	if (input.find("D")!=sf::String::InvalidPos) {
-		if (state != "duck"&&state!="normalattack") {
+		if (size==normalSize&&state!="normalattack" && state != "groundattack") {
 			if (speed.x < maxSpeed.x) {
 				speed.x += movementSpeed;
 			}
@@ -81,7 +89,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		flip = false;
 	}
 	if (input.find("A") != sf::String::InvalidPos) {
-		if (state != "duck"&&state != "normalattack") {
+		if (size==normalSize&&state != "normalattack" && state != "groundattack") {
 			if (speed.x > -maxSpeed.x) {
 				speed.x -= movementSpeed;
 			}
@@ -92,7 +100,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	}
 //Jumping
 //----------------------------------------------------------------------
-	if (input.find("W") != sf::String::InvalidPos&&state!="duck"&&state != "normalattack") {
+	if (input.find("W") != sf::String::InvalidPos&&state!="duck"&&state.find("attack")==sf::String::InvalidPos) {
 		if (speed.y == 0&&canJump) {
 			speed.y = -7;
 			canJump = false;
@@ -122,25 +130,22 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	}
 //Attacking
 //----------------------------------------------------------------------
-	if (input.find("F") != sf::String::InvalidPos) {
-		if (onGround)
-			state = "normalattack";
+	if (input.find("F") != sf::String::InvalidPos&&state.find("attack")==sf::String::InvalidPos) {
+		if (onGround) {
+			if (input.find("S") != sf::String::InvalidPos)
+				state = "groundattack";
+			else
+				state = "normalattack";
+		}
 		else
 			state = "airattack";
 	}
 	if (iframe > 0)
 		iframe--;
 
-//Idle
-//----------------------------------------------------------------------
-	if (state == "fall"&&losecontrol == 0 && pressedkey)
-		state = "idle";
-	else if (speed.x == 0 && speed.y == 0 && collided && state != "duck" && state != "normalattack" && (state != "fall")) {
-		state = "idle";
-	}
 //Ducking
 //----------------------------------------------------------------------
-	if (input.find("S") != sf::String::InvalidPos&&onGround&&state != "normalattack") {
+	if (input.find("S") != sf::String::InvalidPos&&onGround&&state.find("attack")==sf::String::InvalidPos) {
 		if (size == normalSize)
 			pos.y += normalSize.y - duckSize.y;
 		else if (size == groundSize)
@@ -151,7 +156,8 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	else if (size == duckSize) {
 		size = normalSize;
 		pos.y -= normalSize.y - duckSize.y;
-		state = "idle";
+		if(state=="duck")
+			state = "idle";
 	}
 //Ground size
 //----------------------------------------------------------------------
@@ -176,7 +182,6 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	if (abs(speed.x) < 0.01f)
 		speed.x = 0;
 
-	prev2Speed = prevSpeed;
 	prevSpeed = speed;
 	speed = Fighter::collision(wall);
 
