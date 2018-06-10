@@ -2,7 +2,7 @@
 #include "Wall.h"
 #include <iostream>
 
-Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i)
+Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i, sf::Color color)
 {
 	id = i;
 	size = boxSize;
@@ -19,12 +19,14 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	maxSpeed = sf::Vector2f(20, 30);
 	sprite.setPosition(pos);
 	state = "idle";
+	health = 200;
 	substate = 0;
 	prevState = "idle";
 	onGround = false;
 	frame = -1;
 	defineSprites();
 	sprite.setTexture(texture);
+	sprite.setColor(color);
 }
 
 Fighter::Fighter()
@@ -58,9 +60,15 @@ void Fighter::getHit(Hitbox hit)
 		iframe = hit.iframe;
 		losecontrol = hit.losecontrol;
 		speed = hit.speed;
+		health -= hit.damage;
 		state = "fall";
 		frame = -1;
 	}
+}
+
+int Fighter::getHealth()
+{
+	return health;
 }
 
 void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
@@ -71,11 +79,12 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 //----------------------------------------------------------------------
 	if (state == "fall"&&losecontrol == 0 && pressedkey)
 		state = "idle";
-	else if (frame < 0&&state!="fall")
+	else if (frame < 0 && state != "fall")
 		state = "idle";
-	else if (std::abs(speed.x) < 0.1f && speed.y == 0 && collided && size == normalSize && state.find("attack") == sf::String::InvalidPos && (state != "fall")) {
+	else if (std::abs(speed.x) < 0.1f && speed.y == 0 && collided && size == normalSize && state.find("attack") == sf::String::InvalidPos && (state != "fall"))
 		state = "idle";
-	}
+	if (state == "idle"&&prevState != state)
+		substate = 0;
 //Moving
 //----------------------------------------------------------------------
 	if (input.find("D")!=sf::String::InvalidPos) {
@@ -188,6 +197,10 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	pos.x += speed.x;
 	pos.y += speed.y;
 
+	extern sf::FloatRect view;
+	if (pos.y > view.top + view.height)
+		health = -999;
+
 	if (losecontrol > 0) {	//bounce when no control
 		float bouncecap = 10.0f;
 		if(speed.x!=prevSpeed.x)
@@ -198,6 +211,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 
 //Animate
 //----------------------------------------------------------------------
+	//std::cout << std::string(state) << substate << ", " << frame << "\n";
 	Fighter::animate();
 	//std::printf("%f, %f\n", pos.x, pos.y);
 }

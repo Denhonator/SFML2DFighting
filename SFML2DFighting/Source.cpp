@@ -7,9 +7,11 @@
 Scene scene = Scene();
 bool running = true;
 int gameSpeed = 60;
+sf::FloatRect view = sf::FloatRect(0, 0, 2560, 1440);
 
 void draw() {
 	sf::RenderWindow window(sf::VideoMode(2560, 1440), "FIGHT");
+	window.setView(sf::View(view));
 	sf::Clock clock;
 	sf::Time elapsed;
 	std::vector<sf::Sprite> drawlist;

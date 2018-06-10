@@ -9,13 +9,14 @@ public:
 	sf::Vector2f size;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
-	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i);
+	Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i, sf::Color color=sf::Color(255,255,255,255));
 	Fighter();
 	~Fighter();
 	sf::Sprite getSprite();
 	sf::Texture getTexture();
 	std::vector<Hitbox> getHitboxes();
 	void getHit(Hitbox hit);
+	int getHealth();
 	void physics(std::vector<Wall> wall, sf::String inputMethod);
 
 	sf::Vector2f collision(std::vector<Wall> wall) {
@@ -113,8 +114,10 @@ public:
 				offset = sf::Vector2f(0, -1.20*(substate-2));
 		}
 		else if (state == "normalattack") {
-			if (frame < 0&&prevState!=state) {	//Get to attacking only if state has changed
+			if (frame < 0) {
 				frame = 25;
+				if (prevState == state)
+					frame = 30;
 				substate = 0;
 			}
 			if (state == "normalattack") {
@@ -131,8 +134,10 @@ public:
 			}
 		}
 		else if (state == "groundattack") {
-			if (frame < 0 && prevState != state) {	//Get to attacking only if state has changed
+			if (frame < 0) {
 				frame = 30;
+				if (prevState == state)
+					frame = 45;
 				substate = 0;
 			}
 			if (state == "groundattack") {
@@ -149,7 +154,7 @@ public:
 				offset = sf::Vector2f(12.5f, 9);
 		}
 		else if (state == "airattack") {
-			if (frame < 0 && prevState != state) {
+			if (frame < 0) {
 				frame = 40;
 				substate = 0;
 			}
@@ -158,9 +163,9 @@ public:
 				frame = std::min(frame, 10);
 			}
 			else {
-				if (frame == 35)
+				if (frame == 33)
 					substate = 1;
-				if (frame == 30)
+				if (frame == 26)
 					substate = 2;
 				if (frame == 10)
 					substate = 1;
@@ -335,6 +340,7 @@ private:
 	int frame;
 	int iframe = 0;
 	int losecontrol = 0;
+	int health;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	sf::Vector2f prevSpeed;

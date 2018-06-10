@@ -6,7 +6,7 @@
 Scene::Scene()
 {
 	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png", 0));
-	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(600, 800), "toad.png", 1));
+	fighter.push_back(Fighter(sf::Vector2f(50, 90), sf::Vector2f(1400, 800), "toad.png", 1, sf::Color(255, 50, 50, 255)));
 
 	createWalls();
 
@@ -35,6 +35,12 @@ void Scene::update()
 	for (int i = 0; i < wall.size(); i++) {
 		wall.at(i).update();
 	}
+	if (fighter.at(0).getHealth() <= 0) {
+		fighter.at(0) = Fighter(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png", 0);
+	}
+	if (fighter.at(1).getHealth() <= 0) {
+		fighter.at(1) = Fighter(sf::Vector2f(50, 90), sf::Vector2f(1400, 800), "toad.png", 1, sf::Color(255,50,50,255));
+	}
 	fighter.at(0).physics(wall, "WASD");
 	fighter.at(1).physics(wall, "ARROWS");
 	drawlist.push_back(bcg);
@@ -44,7 +50,7 @@ void Scene::update()
 	std::vector<Hitbox> hitboxes;
 	for (int i = 0; i<fighter.size(); i++) {
 		drawlist.push_back(fighter.at(i).getSprite());
-		if (true) {
+		if (false) {
 			rectDrawList.push_back(sf::RectangleShape(fighter.at(i).size));
 			rectDrawList.back().setPosition(fighter.at(i).pos);
 			rectDrawList.back().setFillColor(sf::Color(0, 0, 255, 50));
