@@ -15,6 +15,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	fighterName = spritesheet.substring(0, spritesheet.find("."));
 	speed = sf::Vector2f(0, 0);
 	prevSpeed = sf::Vector2f(0, 0);
+	prev2Speed = sf::Vector2f(0, 0);
 	movementSpeed = 4;
 	maxSpeed = sf::Vector2f(20, 30);
 	sprite.setPosition(pos);
@@ -119,6 +120,24 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		}
 		state = "jump";
 	}
+//Attacking
+//----------------------------------------------------------------------
+	if (input.find("F") != sf::String::InvalidPos) {
+		if (onGround)
+			state = "normalattack";
+		else
+			state = "airattack";
+	}
+	if (iframe > 0)
+		iframe--;
+
+//Idle
+//----------------------------------------------------------------------
+	if (state == "fall"&&losecontrol == 0 && pressedkey)
+		state = "idle";
+	else if (speed.x == 0 && speed.y == 0 && collided && state != "duck" && state != "normalattack" && (state != "fall")) {
+		state = "idle";
+	}
 //Ducking
 //----------------------------------------------------------------------
 	if (input.find("S") != sf::String::InvalidPos&&onGround&&state != "normalattack") {
@@ -129,25 +148,9 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		size = duckSize;
 		state = "duck";
 	}
-	else if(size==duckSize) {
+	else if (size == duckSize) {
 		size = normalSize;
 		pos.y -= normalSize.y - duckSize.y;
-		state = "idle";
-	}
-//Attacking
-//----------------------------------------------------------------------
-	if (input.find("F") != sf::String::InvalidPos&&onGround) {
-		if(onGround)
-			state = "normalattack";
-	}
-	if (iframe > 0)
-		iframe--;
-
-//Idle
-//----------------------------------------------------------------------
-	if (state == "fall"&&losecontrol == 0 && pressedkey)
-		state = "idle";
-	else if (speed.x == 0 && speed.y == 0 && collided && state != "duck" && state != "normalattack" && (state != "fall")) {
 		state = "idle";
 	}
 //Ground size
@@ -173,11 +176,20 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	if (abs(speed.x) < 0.01f)
 		speed.x = 0;
 
+	prev2Speed = prevSpeed;
 	prevSpeed = speed;
-	speed = Fighter::collision(wall, speed, pos, size);
+	speed = Fighter::collision(wall);
 
 	pos.x += speed.x;
 	pos.y += speed.y;
+
+	if (losecontrol > 0) {	//bounce when no control
+		float bouncecap = 10.0f;
+		if(speed.x!=prevSpeed.x)
+			speed.x = -std::max(std::min(prevSpeed.x, bouncecap), -bouncecap);
+		if (speed.y != prevSpeed.y)
+			speed.y = -std::max(std::min(prevSpeed.y, bouncecap),-bouncecap);
+	}
 
 //Animate
 //----------------------------------------------------------------------

@@ -18,7 +18,7 @@ public:
 	void getHit(Hitbox hit);
 	void physics(std::vector<Wall> wall, sf::String inputMethod);
 
-	sf::Vector2f collision(std::vector<Wall> wall, sf::Vector2f speed, sf::Vector2f pos, sf::Vector2f size) {
+	sf::Vector2f collision(std::vector<Wall> wall) {
 		sf::Vector2f spd = speed;
 		bool col = false;
 		onGround = false;
@@ -134,6 +134,32 @@ public:
 					offset = sf::Vector2f(5, 5);
 			}
 		}
+		else if (state == "airattack") {
+			if (frame < 0 && prevState != state) {
+				frame = 40;
+				substate = 0;
+			}
+			else if (frame < 0) {
+				state = "idle";
+				substate = 0;
+			}
+			if (onGround) {
+				substate = 1;
+				frame = std::min(frame, 10);
+			}
+			else {
+				if (frame == 35)
+					substate = 1;
+				if (frame == 30)
+					substate = 2;
+				if (frame == 10)
+					substate = 1;
+			}
+			if (substate < 2)
+				offset = sf::Vector2f(3, -7);
+			else
+				offset = sf::Vector2f(8, 0);
+		}
 
 //Hitbox Definitions
 //-------------------------------------------------------------------------------------------------------
@@ -152,6 +178,24 @@ public:
 			else {
 				addbox.pos += sf::Vector2f(75, 20);
 				addbox.speed.x = 7;
+			}
+			addbox.update();
+			hitbox.push_back(addbox);
+		}
+		else if (state == "airattack"&&substate == 2) {
+			Hitbox addbox = Hitbox(sf::Vector2f(30, 30), pos);
+			addbox.damage = 10;
+			addbox.iframe = 20;
+			addbox.losecontrol = 20;
+			addbox.owner = id;
+			addbox.speed.y = 10;
+			if (flip) {
+				addbox.pos += sf::Vector2f(-70, 3);
+				addbox.speed.x = -4;
+			}
+			else {
+				addbox.pos += sf::Vector2f(90, 3);
+				addbox.speed.x = 4;
 			}
 			addbox.update();
 			hitbox.push_back(addbox);
@@ -231,6 +275,10 @@ public:
 			spriteDefinitions["normalattack0"] = sf::IntRect(99, 25, 26, 31);
 			spriteDefinitions["normalattack1"] = sf::IntRect(128, 25, 38, 31);
 			spriteDefinitions["normalattack2"] = sf::IntRect(36, 23, 25, 35);
+			//spriteDefinitions["airattack0"] = sf::IntRect(168, 26, 34, 31);
+			spriteDefinitions["airattack0"] = sf::IntRect(209, 17, 34, 41);
+			spriteDefinitions["airattack1"] = sf::IntRect(250, 19, 33, 38);
+			spriteDefinitions["airattack2"] = sf::IntRect(285, 24, 51, 32);
 			spriteDefinitions["fall0"] = sf::IntRect(542, 160, 27, 36);
 			spriteDefinitions["fall1"] = sf::IntRect(510, 162, 28, 37);
 			spriteDefinitions["fall2"] = sf::IntRect(84, 164, 33, 34);
@@ -259,6 +307,7 @@ private:
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	sf::Vector2f prevSpeed;
+	sf::Vector2f prev2Speed;
 	bool canJump = false;
 	bool doubleJump = false;
 	bool collided = false;
