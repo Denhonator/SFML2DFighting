@@ -8,6 +8,8 @@ AI::AI(int id)
 	keys = "";
 	character = id;
 	use = { 'A', 'D', 'W', 'S', 'F' };
+	fbuffer.reserve(480);
+	sbuffer.reserve(480);
 }
 
 AI::AI()
@@ -27,23 +29,33 @@ void AI::play()
 {
 	if (!run)
 		return;
-	fbuffer.clear();
-	ibuffer.clear();
-	sbuffer.clear();
+
+	if (loop >= 60)
+		resizing = true;
+	else {
+		loop++;
+		resizing = false;
+	}
 
 	std::vector<int> prevhealth = health;
 	health.clear();
 
 	extern Scene scene;
 
+	if (resizing) {
+		fbuffer.erase(fbuffer.begin(), fbuffer.begin()+floats);
+		//std::cout << fbuffer.size() << "\n";
+
+		sbuffer.erase(sbuffer.begin(), sbuffer.begin() + strings);
+		//std::cout << sbuffer.size() << "\n";
+
+		keysbuffer.erase(keysbuffer.begin());
+		//std::cout << keysbuffer.size() << "\n";
+	}
+
 	for (int i = 0; i < scene.fighter.size(); i++) {
 		fbuffer.push_back(scene.fighter.at(i).pos.x);
 		fbuffer.push_back(scene.fighter.at(i).pos.y);
-		fbuffer.push_back(scene.fighter.at(i).speed.x);
-		fbuffer.push_back(scene.fighter.at(i).speed.y);
-
-		ibuffer.push_back(scene.fighter.at(i).getFrame());
-		ibuffer.push_back(scene.fighter.at(i).getHealth());
 
 		sbuffer.push_back(scene.fighter.at(i).getState());
 
@@ -51,32 +63,27 @@ void AI::play()
 	}
 	AI::input();
 
-	floats.push_back(fbuffer);
-	ints.push_back(ibuffer);
-	strings.push_back(sbuffer);
-
 	if (!prevhealth.empty()) {
 		for (int i = 0; i < scene.fighter.size(); i++) {
 			if (health.at(i) != prevhealth.at(i)) {
-				if (i == character) {
-					badfloats.reserve(badfloats.size() + floats.size());
-					badfloats.insert(badfloats.end(), floats.begin(), floats.end());
-					badints.reserve(badints.size() + ints.size());
-					badints.insert(badints.end(), ints.begin(), ints.end());
-					badstrings.reserve(badstrings.size() + strings.size());
-					badstrings.insert(badstrings.end(), strings.begin(), strings.end());
+				if (i == character) {	//take damage
+					badf.reserve(badf.size() + fbuffer.size());
+					badf.insert(badf.end(), fbuffer.begin(), fbuffer.end());
+					bads.reserve(bads.size() + sbuffer.size());
+					bads.insert(bads.end(), sbuffer.begin(), sbuffer.end());
+					badkeys.reserve(badkeys.size() + keysbuffer.size());
+					badkeys.insert(badkeys.end(), keysbuffer.begin(), keysbuffer.end());
+					std::cout << "BADS: " << badf.size() << ", " << bads.size() << ", " << badkeys.size() << "\n";
 				}
-				else {
-					goodfloats.reserve(goodfloats.size() + floats.size());
-					goodfloats.insert(goodfloats.end(), floats.begin(), floats.end());
-					goodints.reserve(goodints.size() + ints.size());
-					goodints.insert(goodints.end(), ints.begin(), ints.end());
-					goodstrings.reserve(goodstrings.size() + strings.size());
-					goodstrings.insert(goodstrings.end(), strings.begin(), strings.end());
+				else {					//deal damage
+					goodf.reserve(goodf.size() + fbuffer.size());
+					goodf.insert(goodf.end(), fbuffer.begin(), fbuffer.end());
+					goods.reserve(goods.size() + sbuffer.size());
+					goods.insert(goods.end(), sbuffer.begin(), sbuffer.end());
+					goodkeys.reserve(goodkeys.size() + keysbuffer.size());
+					goodkeys.insert(goodkeys.end(), keysbuffer.begin(), keysbuffer.end());
+					std::cout << "GOODS: " << goodf.size() << ", " << goods.size() << ", " << goodkeys.size() << "\n";
 				}
-				floats.clear();
-				ints.clear();
-				strings.clear();
 			}
 		}
 	}
@@ -86,20 +93,25 @@ void AI::input()
 {
 	int threshold = 15;
 	int randmax = 1000;
+	float similarity = 2.0f;
 	std::map<char, int> chance;
 	for (int i = 0; i < use.size(); i++)
 		chance[use.at(i)] = threshold;
-	for (int i = 0; i < goodfloats.size(); i++) {
-		if (AI::similar(fbuffer, goodfloats.at(i))) {
-			for (int j = 0; j < use.size(); j++) {
-				if (sbuffer.back().find(use.at(j))) {
-					chance[use.at(j)] += (randmax - chance[use.at(j)]) / 4;
-					std::cout << "Chance increased for " << use.at(j) << "\n";
+	for (int i = 0; i < goodf.size(); i += floats) {
+		for (int j = 0; j < floats; j++) {
+			if (std::abs(fbuffer.at(fbuffer.size()-(floats-j)) - goodf.at(i + j)) > similarity)
+				break;
+			else if (j == floats-1) {	//On finding a matching scenario for floats
+				for (int k = 0; k < use.size(); k++) {
+					if (goodkeys.at((i / floats)).find(use.at(k)) != std::string::npos) {
+						chance[use.at(k)] += (randmax - chance[use.at(k)]) * 2;
+						std::cout << "Increased chance for " << use.at(k) << "\n";
+					}
 				}
-			}	
+			}
 		}
 	}
-	sf::String action = "";
+	std::string action = "";
 	if (rand() % randmax + 1 <= chance['A'])
 		action += "A";
 	else if (rand() % randmax + 1 <= chance['D'])	//can't move in both directions at once
@@ -111,7 +123,7 @@ void AI::input()
 	if (rand() % randmax + 1 <= chance['F'])
 		action += "F";
 	keys = action;
-	sbuffer.push_back(keys);
+	keysbuffer.push_back(keys);
 }
 
 bool AI::similar(std::vector<int> int1, std::vector<int> int2) {
@@ -130,7 +142,7 @@ bool AI::similar(std::vector<float> float1, std::vector<float> float2) {
 	}
 	return true;
 }
-bool AI::similar(std::vector<sf::String> string1, std::vector<sf::String> string2) {
+bool AI::similar(std::vector<std::string> string1, std::vector<std::string> string2) {
 	for (int i = 0; i < string1.size(); i++) {
 		if (string1.at(i) != string2.at(i))
 			return false;

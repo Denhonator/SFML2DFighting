@@ -68,7 +68,7 @@ int Fighter::getFrame()
 void Fighter::getHit(Hitbox hit)
 {
 	if (iframe == 0) {
-		std::cout << "Fighter " << id << " was hit for " << hit.damage << " damage by fighter " << hit.owner << std::endl;
+		//std::cout << "Fighter " << id << " was hit for " << hit.damage << " damage by fighter " << hit.owner << std::endl;
 		iframe = hit.iframe;
 		losecontrol = hit.losecontrol;
 		speed = hit.speed;
