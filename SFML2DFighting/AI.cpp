@@ -1,6 +1,5 @@
 #include "AI.h"
 #include "scene.h"
-#include <iostream>
 
 AI::AI(int id)
 {
@@ -73,7 +72,6 @@ void AI::play()
 					bads.insert(bads.end(), sbuffer.begin(), sbuffer.end());
 					badkeys.reserve(badkeys.size() + keysbuffer.size());
 					badkeys.insert(badkeys.end(), keysbuffer.begin(), keysbuffer.end());
-					std::cout << "BADS: " << badf.size() << ", " << bads.size() << ", " << badkeys.size() << "\n";
 				}
 				else {					//deal damage
 					goodf.reserve(goodf.size() + fbuffer.size());
@@ -82,7 +80,6 @@ void AI::play()
 					goods.insert(goods.end(), sbuffer.begin(), sbuffer.end());
 					goodkeys.reserve(goodkeys.size() + keysbuffer.size());
 					goodkeys.insert(goodkeys.end(), keysbuffer.begin(), keysbuffer.end());
-					std::cout << "GOODS: " << goodf.size() << ", " << goods.size() << ", " << goodkeys.size() << "\n";
 				}
 			}
 		}
@@ -105,7 +102,6 @@ void AI::input()
 				for (int k = 0; k < use.size(); k++) {
 					if (goodkeys.at((i / floats)).find(use.at(k)) != std::string::npos) {
 						chance[use.at(k)] += (randmax - chance[use.at(k)]) * 2;
-						std::cout << "Increased chance for " << use.at(k) << "\n";
 					}
 				}
 			}

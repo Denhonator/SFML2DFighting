@@ -1,6 +1,5 @@
 #include "Fighter.h"
 #include "Wall.h"
-#include <iostream>
 
 Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i, sf::Color color)
 {
@@ -60,18 +59,18 @@ sf::String Fighter::getState()
 	return state;
 }
 
-int Fighter::getFrame()
+float Fighter::getFrame()
 {
 	return frame;
 }
 
 void Fighter::getHit(Hitbox hit)
 {
-	if (iframe == 0) {
-		//std::cout << "Fighter " << id << " was hit for " << hit.damage << " damage by fighter " << hit.owner << std::endl;
+	if (iframe <= 0) {
+		extern float gameSpeed;
 		iframe = hit.iframe;
 		losecontrol = hit.losecontrol;
-		speed = hit.speed;
+		speed = hit.speed*(60.0f/gameSpeed);
 		health -= hit.damage;
 		state = "fall";
 		frame = -1;
@@ -86,7 +85,9 @@ int Fighter::getHealth()
 void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
-
+	extern float gameSpeed;
+	float fpsmult = (60.0f / gameSpeed);
+	float ms = movementSpeed * fpsmult;
 //Idle
 //----------------------------------------------------------------------
 	if (state == "fall"&&losecontrol == 0 && pressedkey)
@@ -102,7 +103,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	if (input.find("D")!=sf::String::InvalidPos) {
 		if (size==normalSize&&state!="normalattack" && state != "groundattack") {
 			if (speed.x < maxSpeed.x) {
-				speed.x += movementSpeed;
+				speed.x += ms;
 			}
 			if (onGround)
 				state = "run";
@@ -112,7 +113,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 	if (input.find("A") != sf::String::InvalidPos) {
 		if (size==normalSize&&state != "normalattack" && state != "groundattack") {
 			if (speed.x > -maxSpeed.x) {
-				speed.x -= movementSpeed;
+				speed.x -= ms;
 			}
 			if (onGround)
 				state = "run";
@@ -123,19 +124,19 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 //----------------------------------------------------------------------
 	if (input.find("W") != sf::String::InvalidPos&&state!="duck"&&state.find("attack")==sf::String::InvalidPos) {
 		if (speed.y == 0&&canJump) {
-			speed.y = -7;
+			speed.y = -7*fpsmult;
 			canJump = false;
 			jumpHold = 20;
 			state = "jump";
 		}
 		else if (doubleJump) {
-			speed.y = -10;
+			speed.y = -10 * fpsmult;
 			doubleJump = false;
 			doublejumps++;
 		}
 		else if (jumpHold > 0) {
-			speed.y -= jumpHold*0.10f;
-			jumpHold-= jumpHold*0.15f;
+			speed.y -= jumpHold*0.10f*fpsmult*fpsmult;
+			jumpHold-= jumpHold*0.15f*fpsmult;
 		}
 	}
 	else if (!canJump&&doublejumps<1) {
@@ -161,8 +162,9 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		else
 			state = "airattack";
 	}
+	extern float gameSpeed;
 	if (iframe > 0)
-		iframe--;
+		iframe-=60.0f/gameSpeed;
 
 //Ducking
 //----------------------------------------------------------------------
@@ -194,11 +196,11 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 //Modify speed and position
 //----------------------------------------------------------------------
 	if (speed.y<maxSpeed.y) {
-		speed.y += movementSpeed * 0.2f;
+		speed.y += ms * 0.2f * fpsmult;
 	}
 	if (losecontrol > 0)
-		losecontrol--;
-	if(losecontrol==0)
+		losecontrol-=fpsmult;
+	if(losecontrol<=0)
 		speed.x *= 0.7f;
 	if (abs(speed.x) < 0.01f)
 		speed.x = 0;
@@ -214,7 +216,7 @@ void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
 		health = -999;
 
 	if (losecontrol > 0) {	//bounce when no control
-		float bouncecap = 10.0f;
+		float bouncecap = 10.0f*fpsmult;
 		if(speed.x!=prevSpeed.x)
 			speed.x = -std::max(std::min(prevSpeed.x, bouncecap), -bouncecap);
 		if (speed.y != prevSpeed.y)

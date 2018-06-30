@@ -3,15 +3,29 @@
 #include "Fighter.h"
 #include "Wall.h"
 #include <thread>
+#include <Windows.h>
 
 Scene scene = Scene();
 bool running = true;
-int gameSpeed = 60;
+float gameSpeed = 60;
+int fpslimit = 60;
 sf::FloatRect view = sf::FloatRect(0, 0, 2560, 1440);
+sf::Text text;
+sf::Font arial;
+
+void debuglog(sf::String string) {
+	if (text.getString().getSize() > 100)
+		text.setString(text.getString().substring(0, text.getString().find("\n", 100)));
+	text.setString(string + "\n" + text.getString());
+}
 
 void draw() {
 	sf::RenderWindow window(sf::VideoMode(2560, 1440), "FIGHT");
+	window.setFramerateLimit(fpslimit);
+	window.setVerticalSyncEnabled(false);
 	window.setView(sf::View(view));
+	arial.loadFromFile("arial.ttf");
+	text.setFont(arial);
 	sf::Clock clock;
 	sf::Time elapsed;
 	std::vector<sf::Sprite> drawlist;
@@ -30,30 +44,30 @@ void draw() {
 		if (scene.drawready) {
 			drawlist = scene.drawlist;
 			rectDrawList = scene.rectDrawList;
-			scene.drawready = false;
-			clock.restart();
 			scene.drawlist.clear();
 			scene.rectDrawList.clear();
-			window.clear();
-
+			debuglog(std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
 			for (int i = 0; i < drawlist.size(); i++)
 				window.draw(drawlist.at(i));
 
 			for (int i = 0; i < rectDrawList.size(); i++)
 				window.draw(rectDrawList.at(i));
-
+			window.draw(text);
 			window.display();
+			window.clear();
+			scene.drawready = false;
 			slept = false;
+			clock.restart();
 		}
-		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {
-			//std::cout << "Draw sleeping for " << (sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds() << "\n";
-			sf::sleep(sf::microseconds(16666 * (60.0f / gameSpeed)) - elapsed);
+		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {			
+			//debuglog(std::to_string((sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds()) + "\n" + text.getString());
+			sf::sleep(sf::microseconds(16666.0f * (60.0f / gameSpeed)) - elapsed);
 			slept = true;
 		}
 	}
 }
 
-int main()
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
 {
 	uint32_t frame = 0;
 	sf::Clock clock;

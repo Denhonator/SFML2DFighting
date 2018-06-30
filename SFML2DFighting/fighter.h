@@ -2,6 +2,7 @@
 #include "Wall.h"
 #include "Hitbox.h"
 #include "AI.h"
+
 class Fighter
 {
 public:
@@ -16,7 +17,7 @@ public:
 	sf::Texture getTexture();
 	std::vector<Hitbox> getHitboxes();
 	sf::String getState();
-	int getFrame();
+	float getFrame();
 	void getHit(Hitbox hit);
 	int getHealth();
 	void physics(std::vector<Wall> wall, sf::String inputMethod);
@@ -69,19 +70,16 @@ public:
 				substate = 0;
 				frame = 60;
 			}
-			if (frame == 30)
+			if (frame < 30)
 				substate = 1;		
 		}
 		else if (state == "run") {
-			if (frame < 0) {
-				substate = 0;
-				if (state != prevState)
-					frame = 74;
-				else
-					frame = 60;
-			}
-			if (frame % 15 == 0&&substate<4)
+			if (frame < 1) {
+				if(substate>=4||state!=prevState)
+					substate = 0;
+				frame = 16;
 				substate++;
+			}
 		}
 		else if (state == "jump") {
 			if (doublejumps % 2 == 0)
@@ -123,11 +121,13 @@ public:
 				substate = 0;
 			}
 			if (state == "normalattack") {
-				if (frame == 25 || frame == 10)
+				if (frame < 25)
 					substate = 0;
-				else if (frame == 18)
+				if (frame < 18)
 					substate = 1;
-				else if (frame == 5)
+				if (frame < 10)
+					substate = 0;
+				if (frame < 5)
 					substate = 2;
 				if (substate == 0)
 					offset = sf::Vector2f(0, 5);
@@ -143,9 +143,9 @@ public:
 				substate = 0;
 			}
 			if (state == "groundattack") {
-				if (frame == 20)
+				if (frame < 20)
 					substate = 1;
-				else if (frame == 10)
+				if (frame < 10)
 					substate = 2;
 			}
 			if (substate == 0)
@@ -162,14 +162,14 @@ public:
 			}
 			if (onGround) {
 				substate = 1;
-				frame = std::min(frame, 10);
+				frame = std::min(frame, 10.0f);
 			}
 			else {
-				if (frame == 33)
+				if (frame < 33)
 					substate = 1;
-				if (frame == 26)
+				if (frame < 26)
 					substate = 2;
-				if (frame == 10)
+				if (frame < 10)
 					substate = 1;
 			}
 			if (substate < 2)
@@ -253,7 +253,8 @@ public:
 			offset.y *= 3;
 		}
 		sprite.setPosition(sf::Vector2f(pos.x+offset.x-(((sprite.getTextureRect().width*3)-size.x)/2), pos.y+offset.y-5));
-		frame--;
+		extern float gameSpeed;
+		frame-=60.0f/gameSpeed;
 		prevState = state;
 		//std::cout << std::string(state) + std::to_string(substate) << std::endl;
 	}
@@ -343,9 +344,9 @@ private:
 	sf::String prevState;
 	sf::String fighterName;
 	bool flip = false;
-	int frame;
-	int iframe = 0;
-	int losecontrol = 0;
+	float frame;
+	float iframe = 0;
+	float losecontrol = 0;
 	int health;
 	int lives;
 	float movementSpeed;
