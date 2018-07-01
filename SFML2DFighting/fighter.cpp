@@ -1,5 +1,6 @@
 #include "Fighter.h"
 #include "Wall.h"
+#include <Windows.h>
 
 Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String spritesheet, int i, sf::Color color)
 {
@@ -14,6 +15,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	fighterName = spritesheet.substring(0, spritesheet.find("."));
 	speed = sf::Vector2f(0, 0);
 	prevSpeed = sf::Vector2f(0, 0);
+	platformSpeed = sf::Vector2f(0, 0);
 	movementSpeed = 4;
 	maxSpeed = sf::Vector2f(20, 30);
 	sprite.setPosition(pos);
@@ -70,7 +72,8 @@ void Fighter::getHit(Hitbox hit)
 		extern float gameSpeed;
 		iframe = hit.iframe;
 		losecontrol = hit.losecontrol;
-		speed = hit.speed*(60.0f/gameSpeed);
+		speed = hit.speed*(60.0f/gameSpeed)+platformSpeed;
+		platformSpeed = sf::Vector2f(0, 0);
 		health -= hit.damage;
 		state = "fall";
 		frame = -1;
@@ -82,7 +85,7 @@ int Fighter::getHealth()
 	return health;
 }
 
-void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
+void Fighter::physics(std::vector<Wall*> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
 	extern float gameSpeed;
@@ -94,7 +97,7 @@ void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
 		state = "idle";
 	else if (frame < 0 && state != "fall")
 		state = "idle";
-	else if (std::abs(speed.x) < 0.1f && speed.y == 0 && collided && size == normalSize && state.find("attack") == sf::String::InvalidPos && (state != "fall"))
+	else if (std::abs(speed.x) < 0.1f && onGround && size == normalSize && state.find("attack") == sf::String::InvalidPos && (state != "fall"))
 		state = "idle";
 	if (state == "idle"&&prevState != state)
 		substate = 0;
@@ -123,13 +126,14 @@ void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
 //Jumping
 //----------------------------------------------------------------------
 	if (input.find("W") != sf::String::InvalidPos&&state!="duck"&&state.find("attack")==sf::String::InvalidPos) {
-		if (speed.y == 0&&canJump) {
+		if (canJump) {
 			speed.y = -7*fpsmult;
 			canJump = false;
 			jumpHold = 20;
 			state = "jump";
 		}
 		else if (doubleJump) {
+			platformSpeed = sf::Vector2f(0, 0);
 			speed.y = -10 * fpsmult;
 			doubleJump = false;
 			doublejumps++;
@@ -205,11 +209,13 @@ void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
 	if (abs(speed.x) < 0.01f)
 		speed.x = 0;
 
+	speed += platformSpeed;
 	prevSpeed = speed;
 	speed = Fighter::collision(wall);
 
-	pos.x += speed.x;
-	pos.y += speed.y;
+	pos += speed;
+
+	speed -= platformSpeed;
 
 	extern sf::FloatRect view;
 	if (pos.y > view.top + view.height)
@@ -217,6 +223,7 @@ void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
 
 	if (losecontrol > 0) {	//bounce when no control
 		float bouncecap = 10.0f*fpsmult;
+		platformSpeed = sf::Vector2f(0, 0);
 		if(speed.x!=prevSpeed.x)
 			speed.x = -std::max(std::min(prevSpeed.x, bouncecap), -bouncecap);
 		if (speed.y != prevSpeed.y)

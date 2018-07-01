@@ -22,20 +22,20 @@ Scene::~Scene()
 
 void Scene::createWalls()
 {
-	wall.push_back(Wall(sf::Vector2f(2000, 10), sf::Vector2f(270, 1200), sf::Color(255, 255, 255)));
-	wall.push_back(Wall(sf::Vector2f(500, 20), sf::Vector2f(700, 1000), sf::Color(255, 255, 255)));
-	wall.push_back(Wall(sf::Vector2f(500, 20), sf::Vector2f(1200, 800), sf::Color(255, 255, 255)));
-	wall.push_back(Wall(sf::Vector2f(200, 200), sf::Vector2f(1800, 1000), sf::Color(255, 255, 255)));
+	wall.push_back(Wall(sf::Vector2f(2000, 10), sf::Vector2f(270, 1200), sf::Vector2f(0, 0), sf::Color(255, 255, 255)));
+	wall.push_back(Wall(sf::Vector2f(500, 20), sf::Vector2f(700, 1000), sf::Vector2f(0, 0), sf::Color(255, 255, 255)));
+	wall.push_back(Wall(sf::Vector2f(500, 20), sf::Vector2f(1200, 800), sf::Vector2f(0, 0), sf::Color(255, 255, 255)));
+	wall.push_back(Wall(sf::Vector2f(500, 20), sf::Vector2f(700, 750), sf::Vector2f(0, 0.2f), sf::Color(255, 255, 255)));
+	wall.push_back(Wall(sf::Vector2f(200, 200), sf::Vector2f(1800, 1000), sf::Vector2f(0, 0), sf::Color(255, 255, 255)));
+	for (int i = 0; i < wall.size(); i++) {
+		wallref.push_back(&wall.at(i));
+	}
 }
 
 void Scene::update()
 {
 	for (int i = 0; i < wall.size(); i++) {
 		wall.at(i).update();
-		walls.clear();
-		for (int i = 0; i < wall.size(); i++) {
-			walls.push_back(sf::FloatRect(wall.at(i).pos, wall.at(i).size));
-		}
 	}
 	if (fighter.at(0).getHealth() <= 0) {
 		fighter.at(0) = Fighter(sf::Vector2f(50, 90), sf::Vector2f(500, 800), "toad.png", 0);
@@ -43,8 +43,8 @@ void Scene::update()
 	if (fighter.at(1).getHealth() <= 0) {
 		fighter.at(1) = Fighter(sf::Vector2f(50, 90), sf::Vector2f(1400, 800), "toad.png", 1, sf::Color(255,50,50,255));
 	}
-	fighter.at(0).physics(walls, "WASD");
-	fighter.at(1).physics(walls, "ARROWS");
+	fighter.at(0).physics(wallref, "WASD");
+	fighter.at(1).physics(wallref, "ARROWS");
 	fighter.at(1).ai.play();
 	if(!drawready) {
 		drawlist.push_back(bcg);
