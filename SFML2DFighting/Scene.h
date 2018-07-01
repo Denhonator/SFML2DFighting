@@ -7,6 +7,7 @@ class Scene
 public:
 	std::vector<Fighter> fighter;
 	std::vector<Wall> wall;
+	std::vector<sf::FloatRect> walls;
 	sf::Texture background;
 	sf::Sprite bcg;
 	Scene();

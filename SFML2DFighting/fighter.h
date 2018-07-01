@@ -1,5 +1,4 @@
 #pragma once
-#include "Wall.h"
 #include "Hitbox.h"
 #include "AI.h"
 
@@ -20,26 +19,26 @@ public:
 	float getFrame();
 	void getHit(Hitbox hit);
 	int getHealth();
-	void physics(std::vector<Wall> wall, sf::String inputMethod);
+	void physics(std::vector<sf::FloatRect> wall, sf::String inputMethod);
 
-	sf::Vector2f collision(std::vector<Wall> wall) {
+	sf::Vector2f collision(std::vector<sf::FloatRect> wall) {
 		sf::Vector2f spd = speed;
 		bool col = false;
 		onGround = false;
 		for (int i = 0; i<wall.size() ; i++) {
 			//std::printf("%f, %f\n", pos.x, pos.y);
-			if ((pos.x + size.x) > wall.at(i).pos.x&&pos.x < (wall.at(i).pos.x + wall.at(i).size.x))
-				if (wall.at(i).pos.y > (pos.y + size.y - 5) && speed.y >= 0)
-					speed.y = std::fmin(speed.y, wall.at(i).pos.y - (pos.y + size.y));
-				else if ((wall.at(i).pos.y+wall.at(i).size.y-5)<pos.y&&speed.y < 0)
-					speed.y = std::fmax(speed.y, (wall.at(i).pos.y + wall.at(i).size.y) - pos.y);
+			if ((pos.x + size.x) > wall.at(i).left&&pos.x < (wall.at(i).left + wall.at(i).width))
+				if (wall.at(i).top > (pos.y + size.y - 5) && speed.y >= 0)
+					speed.y = std::fmin(speed.y, wall.at(i).top - (pos.y + size.y));
+				else if ((wall.at(i).top+wall.at(i).height-5)<pos.y&&speed.y < 0)
+					speed.y = std::fmax(speed.y, (wall.at(i).top + wall.at(i).height) - pos.y);
 
-			if (pos.y<(wall.at(i).pos.y + wall.at(i).size.y)&&(pos.y + size.y)>wall.at(i).pos.y) {
-				if (speed.x > 0 && wall.at(i).pos.x>pos.x) {
-					speed.x = std::fmin(speed.x, wall.at(i).pos.x - (pos.x+size.x));
+			if (pos.y<(wall.at(i).top + wall.at(i).height)&&(pos.y + size.y)>wall.at(i).top) {
+				if (speed.x > 0 && wall.at(i).left>pos.x) {
+					speed.x = std::fmin(speed.x, wall.at(i).left - (pos.x+size.x));
 				}
-				if (speed.x < 0 && (wall.at(i).pos.x+wall.at(i).size.x)<pos.x+5) {
-					speed.x = std::fmax(speed.x, (wall.at(i).pos.x + wall.at(i).size.x) - pos.x);
+				if (speed.x < 0 && (wall.at(i).left+wall.at(i).width)<pos.x+5) {
+					speed.x = std::fmax(speed.x, (wall.at(i).left + wall.at(i).width) - pos.x);
 				}
 			}
 			if (speed.x != spd.x || speed.y != spd.y) {

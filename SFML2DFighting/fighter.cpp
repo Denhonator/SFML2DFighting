@@ -82,7 +82,7 @@ int Fighter::getHealth()
 	return health;
 }
 
-void Fighter::physics(std::vector<Wall> wall, sf::String inputMethod)
+void Fighter::physics(std::vector<sf::FloatRect> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
 	extern float gameSpeed;

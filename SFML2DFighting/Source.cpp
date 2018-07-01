@@ -1,36 +1,27 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.h"
-#include "Fighter.h"
-#include "Wall.h"
+#include "Debug.h"
 #include <thread>
 #include <Windows.h>
 
 Scene scene = Scene();
+Debug debug = Debug();
 bool running = true;
 float gameSpeed = 60;
 int fpslimit = 60;
 sf::FloatRect view = sf::FloatRect(0, 0, 2560, 1440);
-sf::Text text;
-sf::Font arial;
-
-void debuglog(sf::String string) {
-	if (text.getString().getSize() > 100)
-		text.setString(text.getString().substring(0, text.getString().find("\n", 100)));
-	text.setString(string + "\n" + text.getString());
-}
 
 void draw() {
 	sf::RenderWindow window(sf::VideoMode(2560, 1440), "FIGHT");
 	window.setFramerateLimit(fpslimit);
 	window.setVerticalSyncEnabled(false);
 	window.setView(sf::View(view));
-	arial.loadFromFile("arial.ttf");
-	text.setFont(arial);
 	sf::Clock clock;
 	sf::Time elapsed;
 	std::vector<sf::Sprite> drawlist;
 	std::vector<sf::RectangleShape> rectDrawList;
 	bool slept = false;
+	UINT32 frame = 0;
 	while (running&&window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -46,17 +37,18 @@ void draw() {
 			rectDrawList = scene.rectDrawList;
 			scene.drawlist.clear();
 			scene.rectDrawList.clear();
-			debuglog(std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
 			for (int i = 0; i < drawlist.size(); i++)
 				window.draw(drawlist.at(i));
-
 			for (int i = 0; i < rectDrawList.size(); i++)
 				window.draw(rectDrawList.at(i));
-			window.draw(text);
+			debug.add("Draw took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
+			window.draw(debug.log());
+			debug.add("Debug took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
 			window.display();
 			window.clear();
 			scene.drawready = false;
 			slept = false;
+			debug.add("Display took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
 			clock.restart();
 		}
 		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {			
@@ -73,6 +65,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 	sf::Clock clock;
 	sf::Time elapsed;
 	std::thread drawthread(draw);
+	bool slept = false;
 	while (running)
 	{
 		elapsed = clock.getElapsedTime();
@@ -81,10 +74,12 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 			frame++;
 
 			scene.update();
+			slept = false;
 		}
-		else {
-			//std::cout << "Main sleeping for " << (sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds() << "\n";
-			sf::sleep(sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed);
+		if(!slept) {
+			debug.add("Main took " + std::to_string((clock.getElapsedTime()).asMicroseconds()));
+			sf::sleep(sf::microseconds(16667 * (60.0f / gameSpeed)) - (clock.getElapsedTime()));
+			slept = true;
 		}
 	}
 	drawthread.join();
