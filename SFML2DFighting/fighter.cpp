@@ -10,6 +10,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	duckSize = sf::Vector2f(normalSize.x, normalSize.y*0.7f);
 	groundSize = sf::Vector2f(normalSize.x*1.5f, normalSize.y*0.4f);
 	pos = position;
+	onGroundPos = pos;
 	if (!texture.loadFromFile(spritesheet))
 		std::printf("Could not find %s", spritesheet);
 	fighterName = spritesheet.substring(0, spritesheet.find("."));
@@ -21,6 +22,7 @@ Fighter::Fighter(sf::Vector2f boxSize, sf::Vector2f position, sf::String sprites
 	sprite.setPosition(pos);
 	state = "idle";
 	health = 200;
+	airtime = 0;
 	lives = 999999;
 	substate = 0;
 	prevState = "idle";
@@ -59,6 +61,11 @@ std::vector<Hitbox> Fighter::getHitboxes()
 sf::String Fighter::getState()
 {
 	return state;
+}
+
+sf::Vector2f Fighter::getGroundPos()
+{
+	return onGroundPos;
 }
 
 float Fighter::getFrame()
@@ -217,9 +224,13 @@ void Fighter::physics(std::vector<Wall*> wall, sf::String inputMethod)
 
 	speed -= platformSpeed;
 
-	extern sf::FloatRect view;
-	if (pos.y > view.top + view.height)
-		health = -999;
+	if (!onGround&&speed.y > 1) {
+		airtime += fpsmult;
+		if (airtime > 90)
+			health = -999;
+	}
+	else
+		airtime = 0;
 
 	if (losecontrol > 0) {	//bounce when no control
 		float bouncecap = 10.0f*fpsmult;

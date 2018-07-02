@@ -17,6 +17,7 @@ public:
 	sf::Texture getTexture();
 	std::vector<Hitbox> getHitboxes();
 	sf::String getState();
+	sf::Vector2f getGroundPos();
 	float getFrame();
 	void getHit(Hitbox hit);
 	int getHealth();
@@ -27,6 +28,8 @@ public:
 		bool col = false;
 		onGround = false;
 		for (int i = 0; i<wall.size() ; i++) {
+			if (!wall.at(i)->visible())
+				continue;
 			//std::printf("%f, %f\n", pos.x, pos.y);
 			if ((pos.x + size.x) > wall.at(i)->pos.x&&pos.x < (wall.at(i)->pos.x + wall.at(i)->size.x))
 				if (wall.at(i)->pos.y+wall.at(i)->size.y/2 > pos.y && speed.y >= 0)
@@ -44,7 +47,7 @@ public:
 			}
 			if (speed.x != spd.x || speed.y != spd.y) {
 				col = true;
-				platformSpeed = wall.at(i)->OnCollision();
+				platformSpeed = wall.at(i)->OnCollision();	//Moving platform collision
 				if (speed.y < 0 && speed.y < spd.y) {
 					pos.y = wall.at(i)->pos.y-size.y;
 					if (losecontrol > 0)
@@ -53,6 +56,7 @@ public:
 						speed.y =  0;
 				}
 				if (wall.at(i)->pos.y>=pos.y+size.y) {
+					onGroundPos = pos;
 					onGround = true;
 					canJump = true;
 					doubleJump = false;
@@ -355,12 +359,14 @@ private:
 	float frame;
 	float iframe = 0;
 	float losecontrol = 0;
+	float airtime = 0;
 	int health;
 	int lives;
 	float movementSpeed;
 	sf::Vector2f maxSpeed;
 	sf::Vector2f prevSpeed;
 	sf::Vector2f platformSpeed;
+	sf::Vector2f onGroundPos;
 	bool canJump = false;
 	bool doubleJump = false;
 	bool collided = false;
