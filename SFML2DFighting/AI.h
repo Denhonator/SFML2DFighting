@@ -20,24 +20,11 @@ public:
 	int character;
 
 private:
-	std::vector<float> fbuffer;
-	std::vector<float> goodf;
-	std::vector<float> badf;
-	std::vector<std::string> sbuffer;
-	std::vector<std::string> goods;
-	std::vector<std::string> bads;
-	std::vector<int> health;
-
-	std::vector<std::string> keysbuffer;
-	std::vector<std::string> goodkeys;
-	std::vector<std::string> badkeys;
 	std::string keys;
-
+	int counter = 0;
+	int distance = 500;
+	int height = 800;
 	std::vector<char> use;
-
-	int loop = 0;
-	int floats = 4;
-	int strings = 2;
-	bool resizing;
+	int target = -1;
 };
 

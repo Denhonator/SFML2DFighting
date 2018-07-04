@@ -58,8 +58,8 @@ void Scene::update()
 		fighter.at(1) = Fighter(sf::Vector2f(50, 90), fighter.at(1).getGroundPos(), "toad.png", 1, sf::Color(255,50,50,255));
 	}
 	fighter.at(0).physics(wallref, "WASD");
-	fighter.at(1).physics(wallref, "ARROWS");
-	//fighter.at(1).ai.play();
+	fighter.at(1).physics(wallref, "AI");
+	fighter.at(1).ai.play();
 	if(!drawready) {
 		extern sf::FloatRect view;
 		drawlist.push_back(bcg);

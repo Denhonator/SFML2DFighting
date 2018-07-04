@@ -21,6 +21,7 @@ public:
 	float getFrame();
 	void getHit(Hitbox hit);
 	int getHealth();
+	bool isFlipped();
 	void physics(std::vector<Wall*> wall, sf::String inputMethod);
 
 	sf::Vector2f collision(std::vector<Wall*> wall) {

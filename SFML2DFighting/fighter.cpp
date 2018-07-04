@@ -92,6 +92,11 @@ int Fighter::getHealth()
 	return health;
 }
 
+bool Fighter::isFlipped()
+{
+	return flip;
+}
+
 void Fighter::physics(std::vector<Wall*> wall, sf::String inputMethod)
 {
 	sf::String input = Fighter::chosenAction(inputMethod);
