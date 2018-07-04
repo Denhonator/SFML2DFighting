@@ -48,9 +48,27 @@ void Scene::createWalls()
 
 void Scene::update()
 {
-	for (int i = 0; i < wall.size(); i++) {
-		wall.at(i).update();
+	//update walls to be updated at interval
+	int refresh = 10;
+	int refresh1 = refresh + 1;
+	int viewbuffer = 100;
+	if (frame % refresh1 == 0) {	
+		toUpdate = toUpdateBuf;
+		toUpdateBuf.clear();
 	}
+	//Decide on walls to be updated in equal slices each frame
+	extern sf::FloatRect view;
+	for (int i = (frame%refresh1)*wall.size()/refresh; i < std::min(((frame+1)%refresh1)*wall.size() / refresh, wall.size()); i++) {
+		if (wall.at(i).inRect(sf::FloatRect(view.left - viewbuffer, view.top - viewbuffer, view.width + viewbuffer * 2, view.height + viewbuffer * 2)) || wall.at(i).global) {
+			toUpdateBuf.push_back(i);
+		}
+	}
+	//update walls in view
+	for (int i = 0; i < toUpdate.size(); i++) {
+		wall.at(toUpdate.at(i)).update();
+	}
+	Util::addTime("Wall update", 1);
+
 	if (fighter.at(0).getHealth() <= 0) {
 		fighter.at(0) = Fighter(sf::Vector2f(50, 90), fighter.at(0).getGroundPos(), "toad.png", 0);
 	}
@@ -60,12 +78,11 @@ void Scene::update()
 	fighter.at(0).physics(wallref, "WASD");
 	fighter.at(1).physics(wallref, "AI");
 	fighter.at(1).ai.play();
+
 	if(!drawready) {
-		extern sf::FloatRect view;
 		drawlist.push_back(bcg);
-		for (int i = 0; i < wall.size(); i++) {
-			if(wall.at(i).inRect(view))
-				drawlist.push_back(wallref.at(i)->getSprite());
+		for (int i = 0; i < toUpdate.size(); i++) {
+			drawlist.push_back(wallref.at(toUpdate.at(i))->getSprite());
 		}
 		std::vector<Hitbox> hitboxes;
 		sf::Vector2f middle = sf::Vector2f(-view.width/2, -view.height/2);
@@ -89,4 +106,5 @@ void Scene::update()
 		view = sf::FloatRect(middle, sf::Vector2f(view.width, view.height));
 		drawready = true;
 	}
+	frame++;
 }

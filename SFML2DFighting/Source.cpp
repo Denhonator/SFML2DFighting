@@ -10,6 +10,7 @@ bool running = true;
 float gameSpeed = 60;
 int fpslimit = 60;
 sf::FloatRect view = sf::FloatRect(0, 0, 2560, 1440);
+sf::FloatRect debugview = sf::FloatRect(0, 0, 4000, 2250);
 
 void draw() {
 	sf::RenderWindow window(sf::VideoMode(2560, 1440), "FIGHT");
@@ -31,6 +32,7 @@ void draw() {
 			}
 		}
 		elapsed = clock.getElapsedTime();
+		Util::resetClock();
 		if (scene.drawready) {
 			window.setView(sf::View(view));
 			drawlist = scene.drawlist;
@@ -41,22 +43,21 @@ void draw() {
 				window.draw(drawlist.at(i));
 			for (int i = 0; i < rectDrawList.size(); i++)
 				window.draw(rectDrawList.at(i));
-			_RPT1(0, "Draw took \t%d ", (clock.getElapsedTime() - elapsed).asMicroseconds());
-			//debug.add("Draw took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
-			//sf::Text text = debug.log();
-			//text.setPosition(sf::Vector2f(view.left, view.top));
-			//window.draw(text);
-			//debug.add("Debug took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
+			//_RPT1(0, "Draw took \t%d ", (clock.getElapsedTime() - elapsed).asMicroseconds());
+			Util::addTime("Draw");
+			sf::Text text = Util::log();
+			text.setPosition(sf::Vector2f(view.left, view.top));
+			window.draw(text);
+			Util::addTime("Debug");
 			window.display();
 			window.clear();
 			scene.drawready = false;
 			slept = false;
-			_RPT1(0, "Display took \t%d ", (clock.getElapsedTime() - elapsed).asMicroseconds());
-			//debug.add("Display took " + std::to_string((clock.getElapsedTime() - elapsed).asMicroseconds()));
+			//_RPT1(0, "Display took \t%d ", (clock.getElapsedTime() - elapsed).asMicroseconds());
+			Util::addTime("Display");
 			clock.restart();
 		}
-		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {			
-			//debuglog(std::to_string((sf::microseconds(16667 * (60.0f / gameSpeed)) - elapsed).asMicroseconds()) + "\n" + text.getString());
+		else if (!slept && (16666 * (60.0f / gameSpeed) - elapsed.asMicroseconds() > 10)) {	
 			sf::sleep(sf::microseconds(16666.0f * (60.0f / gameSpeed)) - elapsed);
 			slept = true;
 		}
@@ -76,13 +77,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLin
 		if (elapsed.asMicroseconds()>16666*(60.0f/gameSpeed)) {
 			clock.restart();
 			frame++;
-
+			Util::resetClock(1);
 			scene.update();
 			slept = false;
 		}
 		if(!slept) {
-			//debug.add("Main took " + std::to_string((clock.getElapsedTime()).asMicroseconds()));
-			_RPT1(0, "\nMain took \t%d ", clock.getElapsedTime().asMicroseconds());
+			Util::addTime("Main", 1);
+			//_RPT1(0, "\nMain took \t%d ", clock.getElapsedTime().asMicroseconds());
 			sf::sleep(sf::microseconds(16667 * (60.0f / gameSpeed)) - (clock.getElapsedTime()));
 			slept = true;
 		}

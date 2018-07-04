@@ -40,16 +40,13 @@ sf::Vector2f Wall::OnCollision() {
 
 bool Wall::inRect(sf::FloatRect rect)
 {
-	if (refresh<0) {
-		refresh = 10;
-		if ((pos.x > rect.left&&pos.x<rect.left + rect.width
-			|| pos.x<rect.left&&pos.x + size.x>rect.left)
-			&&(pos.y>rect.top&&pos.y < rect.top + rect.height
-			|| pos.y<rect.top&&pos.y + size.y>rect.top))
-			inview = true;
-		else
-			inview = false;
-	}
+	if ((pos.x > rect.left&&pos.x<rect.left + rect.width
+		|| pos.x<rect.left&&pos.x + size.x>rect.left)
+		&&(pos.y>rect.top&&pos.y < rect.top + rect.height
+		|| pos.y<rect.top&&pos.y + size.y>rect.top))
+		inview = true;
+	else 
+		inview = false;
 	return inview;
 }
 

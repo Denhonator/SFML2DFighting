@@ -15,6 +15,7 @@ public:
 	void update();
 	bool isSolid();
 	bool visible();
+	bool global = false;
 private:
 	sf::Texture* tex;
 	sf::Sprite sprite;

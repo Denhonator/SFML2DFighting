@@ -132,7 +132,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
-    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="fighter.cpp" />
     <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -142,7 +141,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
-    <ClInclude Include="Debug.h" />
     <ClInclude Include="fighter.h" />
     <ClInclude Include="Hitbox.h" />
     <ClInclude Include="Scene.h" />
