@@ -1,11 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.h"
-#include "Debug.h"
+#include "Util.h"
 #include <thread>
 #include <Windows.h>
 
+Util resources = Util();
 Scene scene = Scene();
-Debug debug = Debug();
 bool running = true;
 float gameSpeed = 60;
 int fpslimit = 60;
